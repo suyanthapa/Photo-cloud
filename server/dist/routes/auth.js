@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const authController_1 = __importDefault(require("../controller/authController"));
+const auth_1 = __importDefault(require("../Validation/auth"));
+const validation_1 = __importDefault(require("../Middleware/validation"));
 const authRouter = express_1.default.Router();
-authRouter.post('/register', authController_1.default.register);
+authRouter.post('/register', (0, validation_1.default)(auth_1.default.register), authController_1.default.register);
 exports.default = authRouter;
