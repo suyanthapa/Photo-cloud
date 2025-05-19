@@ -8,9 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
+const dotenv_1 = __importDefault(require("dotenv"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const client = new client_1.PrismaClient();
+dotenv_1.default.config(); // Load .env varia
 //regiser
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -24,6 +30,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             res.status(400).json({ error: "User already exists" });
             return;
         }
+        //create new user
         const user = yield client.user.create({
             data: {
                 email: email,
@@ -31,10 +38,9 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 password: password,
             },
         });
-        console.log("User Created Successfulyy");
         res.status(201).json({
             user,
-            message: "User created successfully"
+            message: "New User created successfully"
         });
         return;
     }
@@ -48,7 +54,33 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
 });
+//login
+const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, password } = req.body;
+    //check user exists or not
+    const exisitingUser = yield client.user.findFirst({
+        where: {
+            email: email,
+            password: password
+        }
+    });
+    if (!exisitingUser) {
+        res.status(200).json({
+            message: "Invalid Login Credentials"
+        });
+        return;
+    }
+    const token = jsonwebtoken_1.default.sign({
+        userId: exisitingUser.id
+    }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    console.log("The token is ", token);
+    res.status(201).json({
+        token,
+        message: "User Logged In "
+    });
+});
 const authController = {
     register,
+    login
 };
 exports.default = authController;

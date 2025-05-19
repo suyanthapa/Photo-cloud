@@ -19,7 +19,19 @@ const userValidation = {
                 'any.required': 'Password is required',
                 'string.min': 'Password must be at least 6 characters',
             }),
-        })
+        }),
+    },
+    login: {
+        body: joi_1.default.object({
+            email: joi_1.default.string().email().required().messages({
+                'any.required': 'Email is required',
+                'string.email': 'Invalid email format',
+            }),
+            password: joi_1.default.string().min(6).required().messages({
+                'any.required': 'Password is required',
+                'string.min': 'Password must be at least 6 characters',
+            }),
+        }),
     }
 };
 exports.default = userValidation;
