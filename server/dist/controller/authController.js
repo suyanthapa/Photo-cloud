@@ -70,6 +70,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
         return;
     }
+    //generate token
     const token = jsonwebtoken_1.default.sign({
         userId: exisitingUser.id
     }, process.env.JWT_SECRET, { expiresIn: '7d' });

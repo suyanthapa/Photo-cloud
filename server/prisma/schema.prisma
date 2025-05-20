@@ -15,6 +15,19 @@ model User {
   password String
   email String @unique
   createdAt DateTime @default(now())
+
+  uploads uploadData[]
+  
+}
+
+model uploadData{
+  id Int @default(autoincrement()) @id
+  photo String
+  description String 
+  createdAt DateTime @default(now())
+
+  userId Int
+  user User @relation(fields: [userId], references: [id])
   
 }
 

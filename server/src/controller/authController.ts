@@ -64,6 +64,7 @@ const login = async ( req: Request, res: Response): Promise<void> =>{
     return
   }
 
+  //generate token
   const token = jwt.sign(
     {
     userId : exisitingUser.id
@@ -79,8 +80,9 @@ const login = async ( req: Request, res: Response): Promise<void> =>{
       message : "User Logged In "
     })
 
-
 }
+
+
 const authController = {
   register,
   login
