@@ -55,8 +55,28 @@ const uploadData = async(req: Request, res: Response):Promise <void> => {
   }
 }
 
+const viewUploadedData = async (req: Request, res: Response):Promise <void> => {
+
+    try{
+
+      
+    return
+    }
+      catch (e:unknown){
+        console.error("View Uploaded Data Error:",e);
+
+        if(e instanceof Error){
+          res.status(500).json({ message: e.message});
+        }
+        else{
+          res.status(500).json({message: "An unknown erro occured"})
+        }
+      }
+    }
+
 const uploadController = {
-    uploadData
+    uploadData,
+    viewUploadedData
 }
 
 export default uploadController;

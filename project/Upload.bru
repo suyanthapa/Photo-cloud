@@ -1,0 +1,25 @@
+meta {
+  name: Upload
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8000/upload
+  body: multipartForm
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "suyanthapa07@gmail.com",
+   
+    "password": "suyanthapa"
+  }
+}
+
+body:multipart-form {
+  photo: @file(C:\Users\user\Downloads\1747718028268.jpg)
+  description: lah haitw descr
+  userId: 1
+}
