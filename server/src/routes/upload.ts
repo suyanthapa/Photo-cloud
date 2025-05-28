@@ -4,6 +4,7 @@ import userValidation from '../Validation/auth';
 import validate from '../Middleware/validation';
 import upload from '../Middleware/multerConfig';
 import uploadController from '../controller/uploadController';
+import getUserfromAuthToken from '../Middleware/jwtfromUser';
 
 const uploadRouter = express.Router();
 
@@ -13,10 +14,10 @@ export const userUpload = upload.fields([
 
 
 //Upload  User Photo
-uploadRouter.post('/upload', userUpload, uploadController.uploadData);
+uploadRouter.post('/upload', userUpload,getUserfromAuthToken, uploadController.uploadData);
 
 //view uploaded data
-uploadRouter.get('viewData', uploadController.viewUploadedData)
+uploadRouter.get('viewData', getUserfromAuthToken,uploadController.viewUploadedData)
 
 export default uploadRouter;
 

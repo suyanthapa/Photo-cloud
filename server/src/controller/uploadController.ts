@@ -1,24 +1,25 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import upload from "../Middleware/multerConfig";
+import IRequest from '../Middleware/IRequest';
 
 const client = new PrismaClient()
 
-const uploadData = async(req: Request, res: Response):Promise <void> => {
+const uploadData = async(req: IRequest, res: Response):Promise <void> => {
  try{
-
+    const userId = req.userId; 
      // Access the file from req.files, not req.body
     const photo = (req.files as { photo?: Express.Multer.File[] })?.photo?.[0];
 
 
-    const { description ,userId} = req.body;
+    const { description } = req.body;
     console.log("body is", req.body)
     console.log("The file is", photo)
     console.log("The description is ", description);
-    console.log("The user is", userId)
+    console.log("The USERiD is", userId)
 
 
-
+  
     if (!photo) {
       res.status(400).json({ message: "No file uploaded." });
       return;

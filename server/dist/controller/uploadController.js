@@ -14,13 +14,14 @@ const client = new client_1.PrismaClient();
 const uploadData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     try {
+        const userId = req.userId;
         // Access the file from req.files, not req.body
         const photo = (_b = (_a = req.files) === null || _a === void 0 ? void 0 : _a.photo) === null || _b === void 0 ? void 0 : _b[0];
-        const { description, userId } = req.body;
+        const { description } = req.body;
         console.log("body is", req.body);
         console.log("The file is", photo);
         console.log("The description is ", description);
-        console.log("The user is", userId);
+        console.log("The USERiD is", userId);
         if (!photo) {
             res.status(400).json({ message: "No file uploaded." });
             return;
@@ -52,7 +53,22 @@ const uploadData = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }
     }
 });
+const viewUploadedData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return;
+    }
+    catch (e) {
+        console.error("View Uploaded Data Error:", e);
+        if (e instanceof Error) {
+            res.status(500).json({ message: e.message });
+        }
+        else {
+            res.status(500).json({ message: "An unknown erro occured" });
+        }
+    }
+});
 const uploadController = {
-    uploadData
+    uploadData,
+    viewUploadedData
 };
 exports.default = uploadController;

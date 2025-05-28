@@ -75,6 +75,10 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         userId: exisitingUser.id
     }, process.env.JWT_SECRET, { expiresIn: '7d' });
     console.log("The token is ", token);
+    res.cookie('uid', token, {
+        httpOnly: true,
+        secure: true
+    });
     res.status(201).json({
         token,
         message: "User Logged In "
