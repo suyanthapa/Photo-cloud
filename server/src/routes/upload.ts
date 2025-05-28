@@ -19,6 +19,11 @@ uploadRouter.post('/upload', userUpload,getUserfromAuthToken, uploadController.u
 //view uploaded data
 uploadRouter.get('/viewData', getUserfromAuthToken,uploadController.viewUploadedData)
 
+
+//edit uploaded data
+uploadRouter.put('/editData', getUserfromAuthToken,uploadController.editData)
+
+
 export default uploadRouter;
 
 

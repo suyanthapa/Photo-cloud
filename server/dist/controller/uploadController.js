@@ -86,8 +86,58 @@ const viewUploadedData = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
     }
 });
+const editData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.userId;
+        const { uploadedId, description } = req.body;
+        const existingUser = yield client.user.findUnique({
+            where: {
+                id: Number(userId)
+            },
+        });
+        if (!existingUser) {
+            res.status(400).json({ error: "User doesnot exist" });
+            return;
+        }
+        const verifyUser = yield client.uploadData.findFirst({
+            where: {
+                userId: Number(userId),
+                id: uploadedId
+            }
+        });
+        if (!verifyUser) {
+            res.status(404).json({ error: "not found any data with this document id" });
+            return;
+        }
+        //update data
+        const updatedData = yield client.uploadData.update({
+            where: {
+                id: uploadedId
+            },
+            data: {
+                description: description
+            }
+        });
+        console.log("The updated data is", updatedData);
+        res.status(200).json({
+            message: "Updated Successfully",
+            data: updatedData,
+        });
+        return;
+    }
+    catch (e) {
+        console.error("View Uploaded Data Error:", e);
+        if (e instanceof Error) {
+            res.status(500).json({ message: e.message });
+        }
+        else {
+            res.status(500).json({ message: "An unknown erro occured" });
+        }
+    }
+});
 const uploadController = {
     uploadData,
-    viewUploadedData
+    viewUploadedData,
+    editData
 };
 exports.default = uploadController;

@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import upload from "../Middleware/multerConfig";
 import IRequest from '../Middleware/IRequest';
+import { promises } from "dns";
 
 const client = new PrismaClient()
 
@@ -97,9 +98,78 @@ const viewUploadedData = async (req: IRequest, res: Response):Promise <void> => 
       }
     }
 
+
+    const editData = async (req: IRequest, res:Response):Promise <void> =>{
+
+      try{
+
+        const userId = req.userId;
+        const {uploadedId, description} = req.body;
+
+          const existingUser = await client.user.findUnique({
+        where: {
+          id: Number(userId)
+         },
+      }); 
+
+      if(!existingUser){
+         res.status(400).json({ error: "User doesnot exist" });
+        return;
+      }
+
+      const verifyUser = await client.uploadData.findFirst({
+        where: {
+          userId : Number(userId),
+          id : uploadedId
+        }
+      })
+
+      if (!verifyUser) {
+      
+       res.status(404).json({ error: "not found any data with this document id" });
+       return;
+    }
+   
+
+      //update data
+      const updatedData = await client.uploadData.update({
+        where: {
+          id : uploadedId
+        },
+        data:{
+          description: description
+        }
+      })
+
+      console.log("The updated data is", updatedData);
+
+      res.status(200).json({
+        message: "Updated Successfully",
+        data: updatedData,
+
+      })
+
+      return;
+
+      }
+
+       catch (e:unknown){
+        console.error("View Uploaded Data Error:",e);
+
+        if(e instanceof Error){
+          res.status(500).json({ message: e.message});
+        }
+        else{
+          res.status(500).json({message: "An unknown erro occured"})
+        }
+      }
+      
+    }
+
 const uploadController = {
     uploadData,
-    viewUploadedData
+    viewUploadedData,
+    editData
 }
 
 export default uploadController;
