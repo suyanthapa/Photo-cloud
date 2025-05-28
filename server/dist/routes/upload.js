@@ -15,5 +15,5 @@ exports.userUpload = multerConfig_1.default.fields([
 //Upload  User Photo
 uploadRouter.post('/upload', exports.userUpload, jwtfromUser_1.default, uploadController_1.default.uploadData);
 //view uploaded data
-uploadRouter.get('viewData', jwtfromUser_1.default, uploadController_1.default.viewUploadedData);
+uploadRouter.get('/viewData', jwtfromUser_1.default, uploadController_1.default.viewUploadedData);
 exports.default = uploadRouter;

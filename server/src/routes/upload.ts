@@ -17,7 +17,7 @@ export const userUpload = upload.fields([
 uploadRouter.post('/upload', userUpload,getUserfromAuthToken, uploadController.uploadData);
 
 //view uploaded data
-uploadRouter.get('viewData', getUserfromAuthToken,uploadController.viewUploadedData)
+uploadRouter.get('/viewData', getUserfromAuthToken,uploadController.viewUploadedData)
 
 export default uploadRouter;
 

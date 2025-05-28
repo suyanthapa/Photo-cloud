@@ -19,7 +19,7 @@ const uploadData = async(req: IRequest, res: Response):Promise <void> => {
     console.log("The USERiD is", userId)
 
 
-  
+
     if (!photo) {
       res.status(400).json({ message: "No file uploaded." });
       return;
@@ -34,7 +34,7 @@ const uploadData = async(req: IRequest, res: Response):Promise <void> => {
         data: {
             photo: photo.filename,
             description,
-            userId : parseInt(userId, 10)
+            userId : Number(userId)
         }
     });
 
@@ -56,11 +56,33 @@ const uploadData = async(req: IRequest, res: Response):Promise <void> => {
   }
 }
 
-const viewUploadedData = async (req: Request, res: Response):Promise <void> => {
+const viewUploadedData = async (req: IRequest, res: Response):Promise <void> => {
 
     try{
+      const userId = req.userId; 
 
-      
+      const existingUser = await client.user.findUnique({
+        where: {
+          id: Number(userId)
+         },
+      }); 
+
+      if(!existingUser){
+         res.status(400).json({ error: "User doesnot exist" });
+        return;
+      }
+
+      const data = await client.uploadData.findMany({
+        where: {
+          userId : Number(userId)
+        }
+      })
+
+      console.log("The uploaded data is:", data);
+
+      res.status(201).json({
+        data
+      })
     return
     }
       catch (e:unknown){

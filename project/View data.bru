@@ -1,0 +1,28 @@
+meta {
+  name: View data
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://localhost:8000/viewdata
+  body: multipartForm
+  auth: inherit
+}
+
+headers {
+  Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTc0ODQ2OTM0OSwiZXhwIjoxNzQ5MDc0MTQ5fQ.Dn8dOVx0gNEfKuMwOf4EWL1kfO2MmpNSuwd971e-5CU
+}
+
+body:json {
+  {
+    "email": "suyanthapa07@gmail.com",
+   
+    "password": "suyanthapa"
+  }
+}
+
+body:multipart-form {
+  photo: @file(C:\Users\user\Downloads\profile-pic (4).png)
+  description: hello OK
+}

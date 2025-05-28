@@ -34,7 +34,7 @@ const uploadData = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             data: {
                 photo: photo.filename,
                 description,
-                userId: parseInt(userId, 10)
+                userId: Number(userId)
             }
         });
         res.status(201).json({
@@ -55,6 +55,25 @@ const uploadData = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 const viewUploadedData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const userId = req.userId;
+        const existingUser = yield client.user.findUnique({
+            where: {
+                id: Number(userId)
+            },
+        });
+        if (!existingUser) {
+            res.status(400).json({ error: "User doesnot exist" });
+            return;
+        }
+        const data = yield client.uploadData.findMany({
+            where: {
+                userId: Number(userId)
+            }
+        });
+        console.log("The uploaded data is:", data);
+        res.status(201).json({
+            data
+        });
         return;
     }
     catch (e) {
