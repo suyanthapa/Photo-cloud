@@ -8,12 +8,14 @@ const auth_1 = __importDefault(require("./routes/auth"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const upload_1 = __importDefault(require("./routes/upload"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const server = (0, express_1.default)();
 server.use(express_1.default.json());
+server.use((0, cors_1.default)({ origin: 'http://localhost:5173' }));
 server.use(express_1.default.urlencoded({ extended: true }));
 server.use((0, cookie_parser_1.default)());
-server.use(auth_1.default);
+server.use('/api/auth', auth_1.default);
 server.use(upload_1.default);
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
