@@ -218,8 +218,6 @@ const viewUploadedData = async (req: IRequest, res: Response):Promise <void> => 
             res.status(500).json({message: "An unknown erro occured"})
           }
       }
-
-
     }
 const uploadController = {
     uploadData,
