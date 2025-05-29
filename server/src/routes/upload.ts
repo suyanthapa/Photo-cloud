@@ -17,11 +17,18 @@ export const userUpload = upload.fields([
 uploadRouter.post('/upload', userUpload,getUserfromAuthToken, uploadController.uploadData);
 
 //view uploaded data
-uploadRouter.get('/viewData', getUserfromAuthToken,uploadController.viewUploadedData)
+uploadRouter.get('/viewData', getUserfromAuthToken,uploadController.viewUploadedData);
 
 
 //edit uploaded data
-uploadRouter.put('/editData', getUserfromAuthToken,uploadController.editData)
+uploadRouter.put('/editData', getUserfromAuthToken,uploadController.editData);
+
+
+//delete uploaded data
+uploadRouter.delete('/deleteData', getUserfromAuthToken,uploadController.deleteData);
+
+
+
 
 
 export default uploadRouter;

@@ -18,4 +18,6 @@ uploadRouter.post('/upload', exports.userUpload, jwtfromUser_1.default, uploadCo
 uploadRouter.get('/viewData', jwtfromUser_1.default, uploadController_1.default.viewUploadedData);
 //edit uploaded data
 uploadRouter.put('/editData', jwtfromUser_1.default, uploadController_1.default.editData);
+//delete uploaded data
+uploadRouter.delete('/deleteData', jwtfromUser_1.default, uploadController_1.default.deleteData);
 exports.default = uploadRouter;

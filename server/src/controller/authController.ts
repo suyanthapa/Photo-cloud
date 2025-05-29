@@ -15,7 +15,7 @@ const register = async (req: Request, res: Response):Promise<void> => {
         email: email,
       },
     });
-
+    
     if (existingusers) {
       res.status(400).json({ error: "User already exists" });
       return;

@@ -103,7 +103,7 @@ const viewUploadedData = async (req: IRequest, res: Response):Promise <void> => 
 
       try{
 
-        const userId = req.userId;
+        const userId = req.userId; //logged in user
         const {uploadedId, description} = req.body;
 
           const existingUser = await client.user.findUnique({
@@ -111,12 +111,13 @@ const viewUploadedData = async (req: IRequest, res: Response):Promise <void> => 
           id: Number(userId)
          },
       }); 
-
+      //CHECK USER EXISTS OR NOT
       if(!existingUser){
          res.status(400).json({ error: "User doesnot exist" });
         return;
       }
-
+      
+      //CHECK WHETHERE THE UPLOADED USER IS SAME OR NOT
       const verifyUser = await client.uploadData.findFirst({
         where: {
           userId : Number(userId),
@@ -166,10 +167,65 @@ const viewUploadedData = async (req: IRequest, res: Response):Promise <void> => 
       
     }
 
+//DELETE DATA
+    const deleteData = async (req: IRequest, res: Response) :Promise <void> =>{
+
+      try{
+        const userId = req.userId;
+
+        const {uploadedId} = req.body;
+
+         //CHECK WHETHERE THE UPLOADED USER IS SAME OR NOT
+      const verifyUser = await client.uploadData.findFirst({
+        where: {
+          userId : Number(userId),
+          id : uploadedId
+        }
+      })
+
+      if (!verifyUser) {
+       res.status(404).json({ error: "not found any data with this document id" });
+       return;
+    }
+
+    const deleteData = await client.uploadData.delete({
+      where: {
+        id: uploadedId
+      }
+    })
+
+     if (!deleteData) {
+       res.status(404).json({ error: " Error while deleting the data " });
+       return;
+    }
+
+      res.status(200).json({
+        message: "Deleted Successfully",
+        DocumentId : uploadedId
+
+      })
+
+      return
+
+      }
+      catch (e:unknown){
+      console.error(" Deleted Data Error:",e);
+
+          if(e instanceof Error){
+            res.status(500).json({ message: e.message});
+          }
+          else{
+            res.status(500).json({message: "An unknown erro occured"})
+          }
+      }
+
+
+    }
 const uploadController = {
     uploadData,
     viewUploadedData,
-    editData
+    editData,
+    deleteData
 }
 
 export default uploadController;
