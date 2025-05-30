@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Register: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    username: '',
+    password: ''
+  });
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     try {
-        console.log(" yaha aaayo haitw ")
-      const res = await axios.post('http://localhost:8000/api/auth/register', {
-        email,
-        username,
-        password,
-      });
+      const res = await axios.post('http://localhost:8000/api/auth/register', formData);
       setMessage('Registration successful!');
       console.log(res.data);
     } catch (err: any) {
-      setMessage(err.response?.data?.message || 'Registration failed.');
+      setMessage(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Registration failed.'
+      );
     }
   };
 
@@ -35,9 +37,9 @@ const Register: React.FC = () => {
             <input
               type="email"
               className="w-full px-3 py-2 border rounded"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="john@example.com"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
             />
           </div>
@@ -47,8 +49,8 @@ const Register: React.FC = () => {
               type="text"
               className="w-full px-3 py-2 border rounded"
               placeholder="yourusername"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               required
             />
           </div>
@@ -57,9 +59,9 @@ const Register: React.FC = () => {
             <input
               type="password"
               className="w-full px-3 py-2 border rounded"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+            
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
             />
           </div>
@@ -70,6 +72,14 @@ const Register: React.FC = () => {
             Register
           </button>
         </form>
+
+        {/* Login Redirect */}
+        <p className="mt-4 text-sm text-center text-gray-600">
+          Already have an account?{' '}
+          <Link to="/" className="text-blue-600 hover:underline">
+            Login
+          </Link>
+        </p>
       </div>
     </div>
   );

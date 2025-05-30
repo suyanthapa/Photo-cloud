@@ -65,7 +65,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
     });
     if (!exisitingUser) {
-        res.status(200).json({
+        res.status(401).json({
             message: "Invalid Login Credentials"
         });
         return;

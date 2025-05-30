@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import dotenv from 'dotenv';
 import jwt  from "jsonwebtoken";
+import { error } from "console";
 
 const client = new PrismaClient();
 dotenv.config(); // Load .env varia
@@ -31,6 +32,7 @@ const register = async (req: Request, res: Response):Promise<void> => {
   
     res.status(201).json({ 
         user,
+        
         message: "New User created successfully" 
     });
     return
@@ -58,12 +60,12 @@ const login = async ( req: Request, res: Response): Promise<void> =>{
   });
 
   if (!exisitingUser){
-    res.status(200).json({
+    res.status(401).json({
       message: "Invalid Login Credentials"
     })
     return
   }
-
+  
   //generate token
   const token = jwt.sign(
     {
