@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login :React.FC = () => {
 
@@ -9,6 +9,8 @@ const Login :React.FC = () => {
         password: ''
     })
     const [ message, setMessage] = useState('');
+    const navigate = useNavigate();
+
 
     const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,6 +20,7 @@ const Login :React.FC = () => {
          const res = await axios.post('http://localhost:8000/api/auth/login',formData);
           setMessage('Login Successfully');
           console.log(res.data);
+          navigate('/dashboard')
     }
     catch (err: any){
         setMessage(
