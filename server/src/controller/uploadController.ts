@@ -12,7 +12,7 @@ const uploadData = async(req: IRequest, res: Response):Promise <void> => {
      // Access the file from req.files, not req.body
     const photo = (req.files as { photo?: Express.Multer.File[] })?.photo?.[0];
 
-
+  
     const { description } = req.body;
     console.log("body is", req.body)
     console.log("The file is", photo)

@@ -6,7 +6,7 @@ meta {
 
 put {
   url: http://localhost:8000/editData
-  body: none
+  body: json
   auth: inherit
 }
 
@@ -16,9 +16,10 @@ headers {
 
 body:json {
   {
-    "email": "suyanthapa07@gmail.com",
+    "description": "updated by suyan thapa",
+    "uploadedId": 10
    
-    "password": "suyanthapa"
+  
   }
 }
 

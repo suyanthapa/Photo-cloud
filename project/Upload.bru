@@ -10,6 +10,10 @@ post {
   auth: inherit
 }
 
+headers {
+  Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTc0ODQ2OTM0OSwiZXhwIjoxNzQ5MDc0MTQ5fQ.Dn8dOVx0gNEfKuMwOf4EWL1kfO2MmpNSuwd971e-5CU
+}
+
 body:json {
   {
     "email": "suyanthapa07@gmail.com",
@@ -19,7 +23,6 @@ body:json {
 }
 
 body:multipart-form {
-  photo: @file(C:\Users\user\Downloads\1747718028268.jpg)
-  description: lah haitw descr
-  userId: 1
+  photo: @file(C:\Users\user\Downloads\suyan.png)
+  description: sunaulo des
 }

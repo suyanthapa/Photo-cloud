@@ -77,16 +77,20 @@ const login = async ( req: Request, res: Response): Promise<void> =>{
 
     console.log("The token is ", token)
 
-    res.cookie('uid',token,{
+    // res.cookie('uid',token,{
+    //   httpOnly: true,
+    //   secure: true
+    // })
+    res.cookie('uid', token, {
       httpOnly: true,
-      secure: true
-    })
+      secure: process.env.NODE_ENV === 'production', // true on https only
+      sameSite: 'lax', // or 'none' if cross-site needed with secure
+    });
 
           
   
     res.status(201).json({
-      token,
-     
+      token: token,
       message : "User Logged In "
     })
 

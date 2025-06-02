@@ -5,20 +5,24 @@ import dotenv from 'dotenv';
 import uploadRouter from './routes/upload';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import path from 'path';
+
 dotenv.config();
 const server = express();
 
 
 
 server.use(express.json());
+server.use(cors({ origin: 'http://localhost:5173' , credentials: true}))
+server.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-server.use(cors({ origin: 'http://localhost:5173' }))
+// server.use(cors({ origin: 'http://localhost:5173' , credentials: true}))
 
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser())
 server.use('/api/auth', authRouter);
 
-server.use(uploadRouter);
+server.use('/api/data',uploadRouter);
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {

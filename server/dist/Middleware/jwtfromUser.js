@@ -18,39 +18,25 @@ dotenv_1.default.config();
 const getUserfromAuthToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
-        const authToken = (_a = req.headers['authorization']) === null || _a === void 0 ? void 0 : _a.replace('Bearer ', '');
-        //const authToken = req.header('Authorization')?.replace('Bearer ', '');
-        const decode = jsonwebtoken_1.default.verify(authToken, process.env.JWT_SECRET);
-        if (decode) {
-            if (typeof decode === "string") {
-                res.status(403).json({
-                    message: "You are not authorized"
-                });
-                return;
-            }
-            req.userId = decode.userId;
-            console.log(req.userId);
-            next();
+        let token = req.cookies.uid;
+        if (!token) {
+            token = (_a = req.headers['authorization']) === null || _a === void 0 ? void 0 : _a.replace('Bearer ', '');
         }
-        else {
-            res.status(403).json({
-                message: "You arenot authorized"
-            });
+        if (!token) {
+            res.status(401).json({ message: "No token provided" });
+            return;
         }
+        const decode = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        if (typeof decode === "string") {
+            res.status(403).json({ message: "You are not authorized" });
+            return;
+        }
+        req.userId = decode.userId;
+        next();
     }
     catch (e) {
-        if (e instanceof Error) {
-            console.error("error:" + e);
-            res.status(401).json({
-                message: e.message
-            });
-        }
-        else {
-            console.error("error" + e);
-            res.status(401).json({
-                message: e
-            });
-        }
+        console.error("Auth error:", e);
+        res.status(401).json({ message: "Invalid or expired token" });
     }
 });
 exports.default = getUserfromAuthToken;

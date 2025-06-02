@@ -1,47 +1,41 @@
-import { NextFunction, Request,Response } from "express"
-import jwt,{JwtPayload} from 'jsonwebtoken'
+import { NextFunction, Response } from "express";
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import IRequest from "./IRequest";
 
 dotenv.config();
 
-const getUserfromAuthToken=async(req:IRequest,res:Response,next:NextFunction)=>{
-    try{
-        const authToken = req.headers['authorization']?.replace('Bearer ', '');
-        //const authToken = req.header('Authorization')?.replace('Bearer ', '');
+const getUserfromAuthToken = async (
+  req: IRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    let token = req.cookies.uid;
+
+    if (!token) {
         
-        
-        const decode=jwt.verify(authToken as string, process.env.JWT_SECRET as string);
-       if(decode){  
-        if(typeof decode==="string"){
-            res.status(403).json({
-                message:"You are not authorized"
-            })
-            return
-        }
-        req.userId = (decode as JwtPayload).userId;
-        console.log(req.userId)
-        next()
-       }else{
-        res.status(403).json({
-            message:"You arenot authorized"
-        })
-       }
-    }catch(e:unknown){
-        if(e instanceof Error){
-            console.error("error:"+e)
-            res.status(401).json({
-                message:e.message
-            })
-        }else{
-            console.error("error"+e)
-            res.status(401).json({
-                message:e
-            })
-        }
+      token = req.headers['authorization']?.replace('Bearer ', '');
     }
-}
 
+    if (!token) {
+      res.status(401).json({ message: "No token provided" });
+      return;
+    }
 
+    const decode = jwt.verify(token, process.env.JWT_SECRET as string);
 
-export default  getUserfromAuthToken
+    if (typeof decode === "string") {
+      res.status(403).json({ message: "You are not authorized" });
+      return;
+    }
+
+    req.userId = (decode as JwtPayload).userId;
+    next();
+  } catch (e) {
+    console.error("Auth error:", e);
+    res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
+
+export default getUserfromAuthToken;

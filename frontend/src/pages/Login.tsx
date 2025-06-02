@@ -17,9 +17,14 @@ const Login :React.FC = () => {
     
 
     try{
-         const res = await axios.post('http://localhost:8000/api/auth/login',formData);
+         const res = await axios.post(
+          'http://localhost:8000/api/auth/login',
+          formData,
+          {withCredentials: true}
+        );
           setMessage('Login Successfully');
           console.log(res.data);
+       
           navigate('/dashboard')
     }
     catch (err: any){
