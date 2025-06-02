@@ -51,7 +51,7 @@ const Dashboard: React.FC = () => {
 
   const fetchUploads = async () => {
     try {
-      const res = await axios.get<{ data: UploadedData[] }>('http://localhost:5000/api/data/viewData', {
+      const res = await axios.get<{ data: UploadedData[] }>('http://localhost:8000/api/data/viewData', {
         withCredentials: true, // IMPORTANT for sending cookies
       });
       setUploads(res.data.data);
@@ -64,24 +64,13 @@ const Dashboard: React.FC = () => {
     fetchUploads();
   }, []); // Run once on component mount
 
-  const handleLogout = () => {
-    // If logout is server-side (cookie cleared), just reload or redirect here
-    // You might want to call your logout endpoint here
-    setUploads([]);
-    alert('Logged out');
-    // Optionally redirect to login page
-  };
+ 
 
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Dashboard</h2>
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
+       
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md space-y-4 mb-10">
@@ -114,7 +103,7 @@ const Dashboard: React.FC = () => {
           uploads.map((item) => (
             <div key={item.id} className="bg-white shadow rounded-lg overflow-hidden border">
               <img
-                src={`http://localhost:5000/uploads/${item.photo}`}
+                src={`http://localhost:8000/uploads/${item.photo}`}
                 alt="uploaded"
                 className="w-full h-48 object-cover"
               />

@@ -14,7 +14,9 @@ const server = express();
 
 server.use(express.json());
 server.use(cors({ origin: 'http://localhost:5173' , credentials: true}))
-server.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+server.use('/uploads', express.static(path.join(__dirname, '../public/assets/documents/photo')));
+
 
 // server.use(cors({ origin: 'http://localhost:5173' , credentials: true}))
 
