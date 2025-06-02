@@ -4,6 +4,7 @@ import axios from 'axios';
 type UploadedData = {
   id: number;
   photo: string;
+  createdAt: string,
   description: string;
 };
 
@@ -65,6 +66,11 @@ const Dashboard: React.FC = () => {
   }, []); // Run once on component mount
 
  
+  const formatDate = (isoString: string) => {
+  const date = new Date(isoString);
+  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+  return date.toLocaleDateString('en-US', options);
+};
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -109,6 +115,11 @@ const Dashboard: React.FC = () => {
               />
               <div className="p-4">
                 <p className="text-gray-800 text-sm">{item.description}</p>
+                const isoDate = "2025-06-02T16:09:46.594Z";
+
+
+              <p className="text-gray-500 text-xs mt-2">{formatDate(item.createdAt)}</p>
+
               </div>
             </div>
           ))
