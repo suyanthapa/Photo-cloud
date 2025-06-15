@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import ThreeDotMenu from "../components/threeDotMenu";
-import { DotsVerticalIcon } from '@radix-ui/react-icons';
-
+import ThreeDotMenu from "../components/ThreeDotMenu";
 
 interface UploadedData {
   id: string;
@@ -15,15 +13,17 @@ interface UploadedData {
 const AllPhotos: React.FC = () => {
   const [uploads, setUploads] = useState<UploadedData[]>([]);
 
-  
   const fetchUploads = async () => {
     try {
-      const res = await axios.get<{ data: UploadedData[] }>('http://localhost:8000/api/data/viewData', {
-        withCredentials: true,
-      });
+      const res = await axios.get<{ data: UploadedData[] }>(
+        "http://localhost:8000/api/data/viewData",
+        {
+          withCredentials: true,
+        }
+      );
       setUploads(res.data.data);
     } catch (error) {
-      console.error('Failed to fetch uploads', error);
+      console.error("Failed to fetch uploads", error);
     }
   };
 
@@ -33,48 +33,51 @@ const AllPhotos: React.FC = () => {
 
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
-    const options: Intl.DateTimeFormatOptions = { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     };
-    return date.toLocaleDateString('en-US', options);
+    return date.toLocaleDateString("en-US", options);
   };
 
   return (
     <div className="layout-container flex h-full grow flex-col">
       <Navbar />
-      
+
       <div className="p-10 max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-9">Photo Gallery</h1>
 
-        {/* Uploaded Photos Display */}
         {uploads.length > 0 ? (
           <div>
             <h2 className="text-xl font-bold mb-6">Your Photos</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {uploads.map((upload) => (
-  <div key={upload.id} className="bg-white rounded-lg shadow-md overflow-hidden relative">
-    <img
-      src={`http://localhost:8000/uploads/${upload.photo}`}
-      alt={upload.description}
-      className="w-full h-48 object-cover"
-    />
-    <div className="p-4">
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="text-gray-700 mb-1">{upload.description}</p>
-          <p className="text-sm text-gray-500">{formatDate(upload.createdAt)}</p>
-        </div>
-       <button onClick={onToggle} className="p-2 rounded-full hover:bg-gray-200">
-  <DotsVerticalIcon className="h-5 w-5" />
-</button>
-
-      </div>
-    </div>
-  </div>
-))}
-
+              {uploads.map((upload) => (
+                <div
+                  key={upload.id}
+                  className="bg-white rounded-lg shadow-md overflow-hidden relative"
+                >
+                  <img
+                    src={`http://localhost:8000/uploads/${upload.photo}`}
+                    alt={upload.description || "Uploaded photo"}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-gray-700 mb-1">
+                          {upload.description || "No description"}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {formatDate(upload.createdAt)}
+                        </p>
+                      </div>
+                      {/* Just render the ThreeDotMenu component */}
+                      <ThreeDotMenu />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         ) : (
