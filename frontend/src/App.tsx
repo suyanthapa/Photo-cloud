@@ -4,7 +4,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import UploadPage from './pages/upload';
 import AllPhotos from './pages/AllPhotos';
-import InsideImage from './components/insideImage';
+import InsideImage from './components/InsideImage';
 
 
 
@@ -18,7 +18,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/upload" element={<UploadPage />} />
         <Route path="/allPhotos" element={<AllPhotos />} />
-        <Route path="/photo/:id" element={<InsideImage />} />
+        <Route path="/allPhotos/photo/:id" element={<InsideImage />} />
       
         
         

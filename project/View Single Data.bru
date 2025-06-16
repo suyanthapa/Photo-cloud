@@ -5,8 +5,8 @@ meta {
 }
 
 get {
-  url: http://localhost:8000/api/data/viewdata
-  body: none
+  url: http://localhost:8000/api/data/viewSingleData
+  body: json
   auth: inherit
 }
 
@@ -16,9 +16,9 @@ headers {
 
 body:json {
   {
-    "email": "suyanthapa07@gmail.com",
+    "id": 27
    
-    "password": "suyanthapa"
+  
   }
 }
 

@@ -47,7 +47,7 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
         const res = await axios.delete(
         'http://localhost:8000/api/data/deleteData',config
       );
-     
+      
        setMessage('Deleted Successfully');
        console.log("response is",res.data);
     }
@@ -75,7 +75,7 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
         >
           <MoreVertical className="h-5 w-5" />
         </button>
-
+      
         {open && (
           <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-50">
             <div className="py-1">

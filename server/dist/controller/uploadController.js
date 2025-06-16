@@ -89,7 +89,7 @@ const viewUploadedData = (req, res) => __awaiter(void 0, void 0, void 0, functio
 const viewSingleData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.userId;
-        const { id } = req.body; //DATA ID
+        const { id } = req.params; //  Get data ID from URL
         const existingUser = yield client.user.findUnique({
             where: {
                 id: Number(userId)

@@ -102,7 +102,7 @@ const viewSingleData = async (req: IRequest, res: Response):Promise <void> => {
 
     try{
       const userId = req.userId; 
-      const{id} =req.body; //DATA ID
+      const { id } = req.params; //  Get data ID from URL
 
       const existingUser = await client.user.findUnique({
         where: {
@@ -139,6 +139,7 @@ const viewSingleData = async (req: IRequest, res: Response):Promise <void> => {
         }
       }
     }
+
     const editData = async (req: IRequest, res:Response):Promise <void> =>{
 
       try{

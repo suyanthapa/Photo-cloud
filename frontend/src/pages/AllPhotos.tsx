@@ -62,7 +62,7 @@ const AllPhotos: React.FC = () => {
                 <div
                   key={upload.id}
                   className="bg-white rounded-lg shadow-md relative"
-
+                  
                 >
                   <img
                     src={`http://localhost:8000/uploads/${upload.photo}`}

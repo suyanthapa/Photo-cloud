@@ -1,7 +1,55 @@
-import React from "react";
+import React,{useEffect,useState} from "react";
 import Navbar from "./Navbar";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+
+ interface photoData{
+    description: string,
+    photo: string,
+    id: number,
+    createdAt: string
+   }
+
 
 const InsideImage: React.FC = () => {
+   
+  const { id} = useParams<{id: string}>();
+  const [message, setMessage] = useState();
+  const [photoData,setPhotoData] = useState<photoData | null>(null);
+
+  useEffect(()=>{
+
+    const fetchPhoto = async () =>{
+      try{
+        console.log("response vanda mathi")
+        const res = await axios.get(
+          `http://localhost:8000/api/data/viewSingleData/${id}`,
+           {
+          withCredentials: true,
+            }
+        );
+        console.log("response data is", res)
+        setPhotoData(res.data.data);
+
+      }
+      catch (err: any) {
+      setMessage(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Deletion failed.'
+      );
+    }     }
+
+     if (id) {
+      fetchPhoto();
+    }
+  },[id])
+
+  if (!photoData) {
+    return <div className="text-center py-10">Loading...</div>;
+  }
+
+
   return (
     <div
       className="relative flex min-h-screen flex-col bg-white overflow-x-hidden"
@@ -15,12 +63,12 @@ const InsideImage: React.FC = () => {
               <div className="flex w-full overflow-hidden aspect-[3/2]">
                 <div
                   className="flex-1 bg-cover bg-center bg-no-repeat"
-                  style={{
-                    backgroundImage:
-                      'url("https://cdn.usegalileo.ai/sdxl10/34a2af7a-c841-4d92-aca7-5735b284ad4b.png")',
-                  }}
-                  
-                ></div>
+                  >
+                    <img
+                    src={`http://localhost:8000/uploads/${photoData.photo}`}
+                    alt="Uploaded"
+                  />
+                    </div>
               </div>
             </div>
           </div>
@@ -29,12 +77,12 @@ const InsideImage: React.FC = () => {
               <div className="col-span-2 grid grid-cols-subgrid border-t border-t-[#E9DFCE] py-5">
                 <p className="text-[#A18249] text-sm">Description</p>
                 <p className="text-[#1C160C] text-sm">
-                  Upper Mustang with beautiful scene
+                   {photoData.description}
                 </p>
               </div>
               <div className="col-span-2 grid grid-cols-subgrid border-t border-t-[#E9DFCE] py-5">
-                <p className="text-[#A18249] text-sm">Uploaded Date</p>
-                <p className="text-[#1C160C] text-sm">June 16, 2025</p>
+                <p className="text-[#A18249] text-sm"> Date</p>
+                <p className="text-[#1C160C] text-sm"> {photoData.createdAt}</p>
               </div>
             </div>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,_1fr))] gap-2 px-4">
