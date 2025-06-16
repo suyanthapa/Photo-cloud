@@ -58,19 +58,17 @@ const InsideImage: React.FC = () => {
       <div className="flex h-full grow flex-col">
       <Navbar />
         <div className="flex flex-1 justify-center gap-1 px-6 py-5">
-          <div className="flex max-w-[920px] flex-1 flex-col">
-            <div className="flex w-full grow bg-white py-3">
-              <div className="flex w-full overflow-hidden aspect-[3/2]">
-                <div
-                  className="flex-1 bg-cover bg-center bg-no-repeat"
-                  >
-                    <img
-                    src={`http://localhost:8000/uploads/${photoData.photo}`}
-                    alt="Uploaded"
-                  />
-                    </div>
-              </div>
-            </div>
+          <div className="flex w-full max-w-[700px] flex-col mx-auto">
+
+           <div className="flex w-full grow bg-white py-3 justify-center">
+            <img
+              src={`http://localhost:8000/uploads/${photoData.photo}`}
+              alt="Uploaded"
+              className="max-w-[500px] w-full max-h-[400px] rounded-md object-contain"
+            />
+          </div>
+
+
           </div>
           <div className="flex w-[360px] flex-col">
             <div className="grid grid-cols-[20%_1fr] gap-x-6 p-4">
