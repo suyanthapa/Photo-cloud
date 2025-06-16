@@ -24,13 +24,18 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
     };
   }, []);
 
+  const handleEdit = async () =>{
+    
+    setOpen(false);
+
+
+  }
+
   const handleDelete = async () => {
     setShowConfirmModal(true);
     setOpen(false); // close the dropdown
-
-   
+ 
   };
-
 
   const handleConfirmDelete = async() => {
      try{
@@ -38,13 +43,10 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
         data: {uploadedId},
         withCredentials : true
       }
-      console.log("Hnadle confirm Delete ------ID returned is :",uploadedId)
+      console.log("Handle confirm Delete ------ID returned is :",uploadedId)
         const res = await axios.delete(
         'http://localhost:8000/api/data/deleteData',config
       );
-
-
-      console.log("lkll",res)
      
        setMessage('Deleted Successfully');
        console.log("response is",res.data);
@@ -77,7 +79,10 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
         {open && (
           <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-50">
             <div className="py-1">
-              <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <button
+              onClick={handleEdit}
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
                 Edit
               </button>
               <button

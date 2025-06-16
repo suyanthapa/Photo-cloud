@@ -86,6 +86,40 @@ const viewUploadedData = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
     }
 });
+const viewSingleData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.userId;
+        const { id } = req.body; //DATA ID
+        const existingUser = yield client.user.findUnique({
+            where: {
+                id: Number(userId)
+            },
+        });
+        if (!existingUser) {
+            res.status(400).json({ error: "User doesnot exist" });
+            return;
+        }
+        const data = yield client.uploadData.findFirst({
+            where: {
+                id: Number(id)
+            }
+        });
+        console.log("The uploaded data is:", data);
+        res.status(201).json({
+            data
+        });
+        return;
+    }
+    catch (e) {
+        console.error("View Uploaded Data Error:", e);
+        if (e instanceof Error) {
+            res.status(500).json({ message: e.message });
+        }
+        else {
+            res.status(500).json({ message: "An unknown erro occured" });
+        }
+    }
+});
 const editData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.userId; //logged in user
@@ -184,6 +218,7 @@ const deleteData = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 const uploadController = {
     uploadData,
     viewUploadedData,
+    viewSingleData,
     editData,
     deleteData
 };

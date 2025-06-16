@@ -98,7 +98,47 @@ const viewUploadedData = async (req: IRequest, res: Response):Promise <void> => 
       }
     }
 
+const viewSingleData = async (req: IRequest, res: Response):Promise <void> => {
 
+    try{
+      const userId = req.userId; 
+      const{id} =req.body; //DATA ID
+
+      const existingUser = await client.user.findUnique({
+        where: {
+          id: Number(userId)
+         },
+      }); 
+
+      if(!existingUser){
+         res.status(400).json({ error: "User doesnot exist" });
+        return;
+      }
+
+      const data = await client.uploadData.findFirst({
+        where: {
+          id : Number(id)
+        }
+      })
+
+      console.log("The uploaded data is:", data);
+
+      res.status(201).json({
+        data
+      })
+    return
+    }
+      catch (e:unknown){
+        console.error("View Uploaded Data Error:",e);
+
+        if(e instanceof Error){
+          res.status(500).json({ message: e.message});
+        }
+        else{
+          res.status(500).json({message: "An unknown erro occured"})
+        }
+      }
+    }
     const editData = async (req: IRequest, res:Response):Promise <void> =>{
 
       try{
@@ -151,7 +191,6 @@ const viewUploadedData = async (req: IRequest, res: Response):Promise <void> => 
       })
 
       return;
-
       }
 
        catch (e:unknown){
@@ -225,6 +264,7 @@ const viewUploadedData = async (req: IRequest, res: Response):Promise <void> => 
 const uploadController = {
     uploadData,
     viewUploadedData,
+    viewSingleData,
     editData,
     deleteData
 }

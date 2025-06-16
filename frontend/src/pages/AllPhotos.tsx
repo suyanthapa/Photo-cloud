@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import ThreeDotMenu from "../components/ThreeDotMenu";
+import { useNavigate } from "react-router-dom";
 
 interface UploadedData {
   id: number;
@@ -12,6 +13,7 @@ interface UploadedData {
 
 const AllPhotos: React.FC = () => {
   const [uploads, setUploads] = useState<UploadedData[]>([]);
+  const navigate = useNavigate();
 
   const fetchUploads = async () => {
     try {
@@ -41,6 +43,10 @@ const AllPhotos: React.FC = () => {
     return date.toLocaleDateString("en-US", options);
   };
 
+  const handleInsideImage = async (id: number) => {
+    navigate(`photo/${id}`)
+  }
+
   return (
     <div className="layout-container flex h-full grow flex-col">
       <Navbar />
@@ -62,6 +68,7 @@ const AllPhotos: React.FC = () => {
                     src={`http://localhost:8000/uploads/${upload.photo}`}
                     alt={upload.description || "Uploaded photo"}
                     className="w-full h-48 object-cover"
+                    onClick={()=> handleInsideImage(upload.id)}
                   />
                   <div className="p-4">
                     <div className="flex justify-between items-center">
