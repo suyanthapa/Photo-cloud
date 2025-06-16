@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import ThreeDotMenu from "../components/ThreeDotMenu";
 
 interface UploadedData {
-  id: string;
+  id: number;
   description: string;
   photo: string;
   createdAt: string;
@@ -55,7 +55,8 @@ const AllPhotos: React.FC = () => {
               {uploads.map((upload) => (
                 <div
                   key={upload.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden relative"
+                  className="bg-white rounded-lg shadow-md relative"
+
                 >
                   <img
                     src={`http://localhost:8000/uploads/${upload.photo}`}
@@ -73,7 +74,8 @@ const AllPhotos: React.FC = () => {
                         </p>
                       </div>
                       {/* Just render the ThreeDotMenu component */}
-                      <ThreeDotMenu />
+                      <ThreeDotMenu uploadedId={upload.id} />
+
                     </div>
                   </div>
                 </div>

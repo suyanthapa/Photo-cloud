@@ -17,6 +17,7 @@ const Login :React.FC = () => {
     
 
     try{
+      console.log("LKogin try bata open vayo")
          const res = await axios.post(
           'http://localhost:8000/api/auth/login',
           formData,

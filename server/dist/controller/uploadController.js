@@ -140,8 +140,11 @@ const editData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 //DELETE DATA
 const deleteData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log("suyan");
         const userId = req.userId;
         const { uploadedId } = req.body;
+        // const uploadedId = Number(req.body.uploadedId);
+        console.log("Received uploadedId:", uploadedId);
         //CHECK WHETHERE THE UPLOADED USER IS SAME OR NOT
         const verifyUser = yield client.uploadData.findFirst({
             where: {

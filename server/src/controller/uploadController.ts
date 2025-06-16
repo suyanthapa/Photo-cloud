@@ -171,9 +171,12 @@ const viewUploadedData = async (req: IRequest, res: Response):Promise <void> => 
     const deleteData = async (req: IRequest, res: Response) :Promise <void> =>{
 
       try{
+        console.log("suyan")
         const userId = req.userId;
 
         const {uploadedId} = req.body;
+      // const uploadedId = Number(req.body.uploadedId);
+       console.log("Received uploadedId:", uploadedId);
 
          //CHECK WHETHERE THE UPLOADED USER IS SAME OR NOT
       const verifyUser = await client.uploadData.findFirst({
