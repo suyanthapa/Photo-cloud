@@ -47,6 +47,7 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
         const res = await axios.delete(
         'http://localhost:8000/api/data/deleteData',config
       );
+      window.location.reload();
       
        setMessage('Deleted Successfully');
        console.log("response is",res.data);

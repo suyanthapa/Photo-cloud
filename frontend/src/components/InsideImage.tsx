@@ -2,6 +2,7 @@ import React,{useEffect,useState} from "react";
 import Navbar from "./Navbar";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import {Pencil} from "lucide-react";
 
  interface photoData{
     description: string,
@@ -14,8 +15,10 @@ import { useParams } from "react-router-dom";
 const InsideImage: React.FC = () => {
    
   const { id} = useParams<{id: string}>();
-  const [message, setMessage] = useState();
+  const [message, setMessage] = useState<string>("");
   const [photoData,setPhotoData] = useState<photoData | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedDescription, setEditedDescription] = useState('');
 
   useEffect(()=>{
 
@@ -36,7 +39,7 @@ const InsideImage: React.FC = () => {
       setMessage(
         err.response?.data?.message ||
         err.response?.data?.error ||
-        'Deletion failed.'
+        'Failed to load data.'
       );
     }     }
 
@@ -49,6 +52,52 @@ const InsideImage: React.FC = () => {
     return <div className="text-center py-10">Loading...</div>;
   }
 
+  const handleEditClick = () =>{
+     setEditedDescription(photoData?.description || "");
+     setIsEditing(true);
+  }
+
+  const handleCancel = () =>{
+    setIsEditing(false);
+    setEditedDescription(photoData?.description || '');
+  }
+
+  const handleSave = async () => {
+    try{
+      const res = await axios.put(
+        "http://localhost:8000/api/data/editData",
+               {
+          uploadedId: photoData.id,
+          description: editedDescription
+        },
+         {withCredentials: true}
+      );
+      setPhotoData((prev) =>
+        prev? {...prev,description: editedDescription} : prev
+      );
+      setIsEditing(false);
+      setMessage("Editing Updated Successfully");
+
+    }
+
+      catch (err: any) {
+      setMessage(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Deletion failed.'
+      );
+    }
+  }
+
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return date.toLocaleDateString("en-US", options);
+  };
 
   return (
     <div
@@ -74,13 +123,47 @@ const InsideImage: React.FC = () => {
             <div className="grid grid-cols-[20%_1fr] gap-x-6 p-4">
               <div className="col-span-2 grid grid-cols-subgrid border-t border-t-[#E9DFCE] py-5">
                 <p className="text-[#A18249] text-sm">Description</p>
-                <p className="text-[#1C160C] text-sm">
-                   {photoData.description}
+                <p className="text-[#1C160C] text-sm flex gap-4">
+                 
+                   
+                  {isEditing ? (
+                      <>
+                        <input
+                        type="text"
+                        value={editedDescription}
+                        onChange={(e) => setEditedDescription(e.target.value)}
+                        className="border px-2 py-1 rounded text-black w-full"
+                      />
+
+                      <button
+                      onClick={handleSave}
+                        className="text-green-600 text-sm font-semibold"
+                        >
+                          Save
+                      </button>
+                       <button
+                        onClick={handleCancel}
+                        className="text-red-600 text-sm font-semibold"
+                      >
+                        Cancel
+                      </button>
+                      </>
+                    )
+                  :
+                (
+                  <>
+
+                  <span>{photoData.description}</span>
+                  <Pencil size={"15px"} onClick={handleEditClick} className="cursor-pointer" />
+                  </>
+                )
+              }
                 </p>
               </div>
               <div className="col-span-2 grid grid-cols-subgrid border-t border-t-[#E9DFCE] py-5">
                 <p className="text-[#A18249] text-sm"> Date</p>
-                <p className="text-[#1C160C] text-sm"> {photoData.createdAt}</p>
+                <p className="text-[#1C160C] text-sm">
+                 { formatDate (photoData.createdAt)}</p>
               </div>
             </div>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,_1fr))] gap-2 px-4">
@@ -163,3 +246,5 @@ const InsideImage: React.FC = () => {
 };
 
 export default InsideImage;
+
+
