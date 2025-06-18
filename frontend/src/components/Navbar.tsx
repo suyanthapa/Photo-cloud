@@ -20,7 +20,7 @@ export default function Navbar() {
           <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/dashboard">Home</Link>
           <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/upload">Upload</Link>
            <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/allPhotos">All Photos</Link>
-          <a className="text-[#0d151c] text-sm font-medium leading-normal" href="#">Create</a>
+          <a className="text-[#0d151c] text-sm font-medium leading-normal" href="#">Shared Photos</a>
         </div>
         <div className="flex gap-2">
           <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#e7eef4] text-[#0d151c] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">

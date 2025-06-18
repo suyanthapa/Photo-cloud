@@ -6,6 +6,7 @@ import uploadRouter from './routes/upload';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import path from 'path';
+import sharedRouter from './routes/share';
 
 dotenv.config();
 const server = express();
@@ -25,6 +26,7 @@ server.use(cookieParser())
 server.use('/api/auth', authRouter);
 
 server.use('/api/data',uploadRouter);
+server.use('/api/data/share',sharedRouter);
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {

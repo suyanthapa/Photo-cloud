@@ -1,0 +1,29 @@
+meta {
+  name: view shared photos
+  type: http
+  seq: 10
+}
+
+get {
+  url: http://localhost:8000/api/data/share/sharePhoto
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjksImlhdCI6MTc1MDI3NDkzMywiZXhwIjoxNzUwODc5NzMzfQ.afOuI1reUGbXGODGvcoC6fFTzV7iDFvBqbyfqxu5Jwc
+}
+
+body:json {
+  {
+    "receiverId": 1,
+    "photoId": 1
+   
+  
+  }
+}
+
+body:multipart-form {
+  photo: @file(C:\Users\user\Downloads\profile-pic (4).png)
+  description: hello OK
+}

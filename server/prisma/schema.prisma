@@ -10,24 +10,34 @@ datasource db {
 }
 
 model User {
-  id Int @default(autoincrement()) @id
-  username String @unique
-  password String
-  email String @unique
-  createdAt DateTime @default(now())
+  id            Int           @id @default(autoincrement())
+  username      String        @unique
+  password      String
+  email         String        @unique
+  createdAt     DateTime      @default(now())
 
-  uploads uploadData[]
-  
+  uploads       uploadData[]  @relation("OwnerUploads")      // Photos the user uploaded
+  sharedPhotos  UserSharedPhotos[]                           // Join records for photos shared with the user
 }
 
-model uploadData{
-  id Int @default(autoincrement()) @id
-  photo String
-  description String 
-  createdAt DateTime @default(now())
+model uploadData {
+  id          Int       @id @default(autoincrement())
+  photo       String
+  description String
+  createdAt   DateTime  @default(now())
 
-  userId Int
-  user User @relation(fields: [userId], references: [id])
-  
+  userId      Int
+  user        User      @relation("OwnerUploads", fields: [userId], references: [id])
+
+  sharedWith  UserSharedPhotos[]                            // Join records for users this photo is shared with
 }
 
+model UserSharedPhotos {
+  userId       Int
+  uploadDataId Int
+
+  user         User       @relation(fields: [userId], references: [id])
+  uploadData   uploadData @relation(fields: [uploadDataId], references: [id])
+
+  @@id([userId, uploadDataId]) // Composite primary key
+}
