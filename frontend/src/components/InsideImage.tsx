@@ -166,78 +166,7 @@ const InsideImage: React.FC = () => {
                  { formatDate (photoData.createdAt)}</p>
               </div>
             </div>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,_1fr))] gap-2 px-4">
-              {[
-                {
-                  label: 'Share on Facebook',
-                  icon: (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      fill="currentColor"
-                      viewBox="0 0 256 256"
-                    >
-                      <path d="M128,24A104,104,0,1,0...Z" />
-                    </svg>
-                  ),
-                },
-                {
-                  label: 'Share on Twitter',
-                  icon: (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      fill="currentColor"
-                      viewBox="0 0 256 256"
-                    >
-                      <path d="M247.39,68.94A8,8,0,0...Z" />
-                    </svg>
-                  ),
-                },
-                {
-                  label: 'Share on Instagram',
-                  icon: (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      fill="currentColor"
-                      viewBox="0 0 256 256"
-                    >
-                      <path d="M128,80a48,48,0,1,0...Z" />
-                    </svg>
-                  ),
-                },
-                {
-                  label: 'Copy Link',
-                  icon: (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      fill="currentColor"
-                      viewBox="0 0 256 256"
-                    >
-                      <path d="M137.54,186.36a8,8,0,0...Z" />
-                    </svg>
-                  ),
-                },
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center gap-2 bg-white py-2.5 text-center"
-                >
-                  <div className="rounded-full bg-[#F4EFE6] p-2.5 text-[#1C160C]">
-                    {item.icon}
-                  </div>
-                  <p className="text-[#1C160C] text-sm font-medium">
-                    {item.label}
-                  </p>
-                </div>
-              ))}
-            </div>
+           
           </div>
         </div>
       </div>
