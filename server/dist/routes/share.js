@@ -10,4 +10,5 @@ const validation_1 = __importDefault(require("../Middleware/validation"));
 const share_1 = __importDefault(require("../Validation/share"));
 const sharedRouter = (0, express_1.Router)();
 sharedRouter.post('/sharePhoto', jwtfromUser_1.default, (0, validation_1.default)(share_1.default.sharePhoto), shareController_1.default.sharePhoto);
+sharedRouter.get('/viewSharedPhotos', jwtfromUser_1.default, (0, validation_1.default)(share_1.default.sharePhoto), shareController_1.default.viewSharedPhotos);
 exports.default = sharedRouter;

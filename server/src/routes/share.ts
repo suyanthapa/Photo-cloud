@@ -8,4 +8,6 @@ const sharedRouter = Router();
 
 sharedRouter.post('/sharePhoto', getUserfromAuthToken,  validate(shareValidation.sharePhoto),shareController.sharePhoto);
 
+
+sharedRouter.get('/viewSharedPhotos', getUserfromAuthToken,  validate(shareValidation.sharePhoto),shareController.viewSharedPhotos);
 export default sharedRouter;

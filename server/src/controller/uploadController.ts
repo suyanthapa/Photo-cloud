@@ -121,6 +121,12 @@ const viewSingleData = async (req: IRequest, res: Response):Promise <void> => {
         }
       })
 
+      if(data?.id !== Number(id)){
+        res.status(400).json({
+          error: "Not found any data"
+        })
+      }
+
       console.log("The uploaded data is:", data);
 
       res.status(201).json({

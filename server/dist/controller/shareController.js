@@ -12,63 +12,127 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const client = new client_1.PrismaClient();
 const sharePhoto = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.userId;
-    const { receiverId, photoId } = req.body;
-    const existingUser = yield client.user.findUnique({
-        where: {
-            id: Number(receiverId)
-        },
-    });
-    //CHECK USER EXISTS OR NOT
-    if (!existingUser) {
-        res.status(400).json({ error: "User doesnot exist" });
-        return;
-    }
-    console.log("Receiver id is", receiverId);
-    console.log("Mine id is", userId);
-    //check photo exists or not
-    const photo = yield client.uploadData.findFirst({
-        where: { id: photoId }
-    });
-    if ((photo === null || photo === void 0 ? void 0 : photo.userId) !== userId) {
-        res.status(400).json({
-            error: "Respective Photo doesnot exist"
+    try {
+        const userId = req.userId;
+        const { receiverId, photoId } = req.body;
+        const existingUser = yield client.user.findUnique({
+            where: {
+                id: Number(receiverId)
+            },
         });
-    }
-    if (receiverId === userId) {
-        res.status(400).json({
-            error: "Photos can't be shared to yourself.. "
+        //CHECK USER EXISTS OR NOT
+        if (!existingUser) {
+            res.status(400).json({ error: "User doesnot exist" });
+            return;
+        }
+        console.log("Receiver id is", receiverId);
+        console.log("Mine id is", userId);
+        //check photo exists or not
+        const photo = yield client.uploadData.findFirst({
+            where: { id: photoId }
         });
-    }
-    //check if already shared or not
-    const alreadyShared = yield client.userSharedPhotos.findUnique({
-        where: {
-            userId_uploadDataId: {
+        if ((photo === null || photo === void 0 ? void 0 : photo.userId) !== userId) {
+            res.status(400).json({
+                error: "Respective Photo doesnot exist"
+            });
+        }
+        if (receiverId === userId) {
+            res.status(400).json({
+                error: "Photos can't be shared to yourself.. "
+            });
+        }
+        //check if already shared or not
+        const alreadyShared = yield client.userSharedPhotos.findUnique({
+            where: {
+                userId_uploadDataId: {
+                    userId: receiverId,
+                    uploadDataId: photoId
+                }
+            }
+        });
+        if (alreadyShared) {
+            res.status(400).json({
+                error: "Photo already shared "
+            });
+        }
+        //share photo to other
+        const sharePhoto = yield client.userSharedPhotos.create({
+            data: {
                 userId: receiverId,
                 uploadDataId: photoId
             }
-        }
-    });
-    if (alreadyShared) {
-        res.status(400).json({
-            error: "Photo already shared "
         });
-    }
-    //share photo to other
-    const sharePhoto = yield client.userSharedPhotos.create({
-        data: {
-            userId: receiverId,
-            uploadDataId: photoId
+        if (!sharePhoto) {
+            res.status(400).json({
+                error: " Sharing photos failed"
+            });
         }
-    });
-    if (!sharePhoto) {
-        res.status(400).json({
-            error: " Sharing photos failed"
-        });
+        res.status(200).json({ message: "Photos shared successfully" });
+        return;
     }
-    res.status(200).json({ message: "Photos shared successfully" });
+    catch (e) {
+        console.error("Upload error:", e);
+        if (e instanceof Error) {
+            res.status(500).json({ message: e.message });
+        }
+        else {
+            res.status(500).json({ message: "An unknown error occurred" });
+        }
+    }
+});
+const viewSharedPhotos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const loggedInUser = Number(req.userId);
+        const existingUser = yield client.user.findUnique({
+            where: {
+                id: Number(loggedInUser)
+            },
+        });
+        //CHECK USER EXISTS OR NOT
+        if (!existingUser) {
+            res.status(400).json({ error: "User doesnot exist" });
+            return;
+        }
+        const viewSharedPhotos = yield client.userSharedPhotos.findMany({
+            where: {
+                uploadData: {
+                    userId: loggedInUser
+                }
+            },
+            select: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true
+                    }
+                },
+                uploadData: {
+                    select: {
+                        id: true,
+                        photo: true,
+                        description: true
+                    }
+                }
+            }
+        });
+        res.status(200).json({
+            message: "Views ",
+            data: viewSharedPhotos
+        });
+        return;
+    }
+    catch (e) {
+        console.error("Upload error:", e);
+        if (e instanceof Error) {
+            res.status(500).json({ message: e.message });
+        }
+        else {
+            res.status(500).json({ message: "An unknown error occurred" });
+        }
+    }
 });
 const shareController = {
-    sharePhoto
+    sharePhoto,
+    viewSharedPhotos
 };
 exports.default = shareController;

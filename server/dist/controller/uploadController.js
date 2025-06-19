@@ -104,6 +104,11 @@ const viewSingleData = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 id: Number(id)
             }
         });
+        if ((data === null || data === void 0 ? void 0 : data.id) !== Number(id)) {
+            res.status(400).json({
+                error: "Not found any data"
+            });
+        }
         console.log("The uploaded data is:", data);
         res.status(201).json({
             data

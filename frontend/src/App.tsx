@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import UploadPage from './pages/upload';
 import AllPhotos from './pages/AllPhotos';
 import InsideImage from './components/InsideImage';
+import SharedPhotosPage from './pages/SharedByYou';
 
 
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/upload" element={<UploadPage />} />
         <Route path="/allPhotos" element={<AllPhotos />} />
         <Route path="/allPhotos/photo/:id" element={<InsideImage />} />
+        <Route path="/sharedByYou" element={<SharedPhotosPage />}></Route>
       
         
         
