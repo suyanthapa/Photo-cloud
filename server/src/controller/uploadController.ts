@@ -199,7 +199,7 @@ const viewSingleData = async (req: IRequest, res: Response):Promise <void> => {
 
       return;
       }
-
+      
        catch (e:unknown){
         console.error("View Uploaded Data Error:",e);
 

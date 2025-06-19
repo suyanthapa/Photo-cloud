@@ -49,6 +49,10 @@ const InsideImage: React.FC = () => {
   },[id])
 
   if (!photoData) {
+    if (message)
+      {
+      return <div className="text-center py-10 text-red-600">{message}</div>;
+     }
     return <div className="text-center py-10">Loading...</div>;
   }
 

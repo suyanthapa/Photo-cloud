@@ -71,7 +71,7 @@ const AllPhotos: React.FC = () => {
                   />
                   <div className="p-4">
                     <div className="flex justify-between items-center">
-                      <div>
+                      <div  >
                         <p className="text-gray-700 mb-1">
                           {upload.description || "No description"}
                         </p>

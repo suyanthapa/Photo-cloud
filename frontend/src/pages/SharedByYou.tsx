@@ -2,6 +2,9 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+
 
 interface sharedData {
     user: {
@@ -19,22 +22,12 @@ interface sharedData {
     }
 }
 const SharedByYou = () => {
-  const images = [
-    "https://cdn.usegalileo.ai/sdxl10/b105e251-6b00-4590-9022-bfb4411ac170.png",
-    "https://cdn.usegalileo.ai/sdxl10/96a1f5cc-4465-466a-990b-5f3ee5e4ea90.png",
-    "https://cdn.usegalileo.ai/sdxl10/ccfae0ee-1f2f-45ae-a3bf-2b67b402ce52.png",
-    "https://cdn.usegalileo.ai/sdxl10/fb503a98-e470-434d-be1b-b5ad9703a166.png",
-    "https://cdn.usegalileo.ai/sdxl10/280a1a13-b902-4048-8b49-8256367f91eb.png",
-    "https://cdn.usegalileo.ai/sdxl10/6400987f-3d23-43c2-86e8-72a89d8a9b15.png",
-    "https://cdn.usegalileo.ai/sdxl10/8fb87f7b-d1a2-434f-8d1d-16185d4ea4e0.png",
-    "https://cdn.usegalileo.ai/sdxl10/4d0bd9a4-2f47-4eeb-8fbf-5fb13eaf0a0b.png",
-  ];
-
-
-
+  
   const [sharedData, setShareData] = useState <sharedData[]>([]);
   const [message , setMessage] = useState('');
 
+  
+    const navigate = useNavigate();
 
   const fetchSharedData = async () => {
 
@@ -45,8 +38,7 @@ const SharedByYou = () => {
                 withCredentials: true
             }
         )
-
-        setShareData(res.data.data);
+          setShareData(res.data.data);
         
     }
     catch (err: any) {
@@ -56,8 +48,12 @@ const SharedByYou = () => {
         'Failed to fetched shared Photos.'
       );
     }
-
   };
+
+  const handleInsideImage =  async (id:number) => {
+    console.log("button clicked")
+     navigate(`photo/${id}`)
+  } 
 
   useEffect(() => {
   fetchSharedData();
@@ -87,15 +83,15 @@ const SharedByYou = () => {
                 key={index}
                 className="bg-white rounded-lg shadow-md relative"
                 >
-                       <img
-                    src={`http://localhost:8000/uploads/${shared.uploadData.photo}`}
-                    alt={shared.uploadData.description || "Uploaded photo"}
-                    className="w-full h-48 object-cover"
-                    
-                  />
-                     <div className="p-3">
+                    <img
+                        src={`http://localhost:8000/uploads/${shared.uploadData.photo}`}
+                        alt={shared.uploadData.description || "Uploaded photo"}
+                        className="w-full h-48 object-cover"
+                        onClick={()=> handleInsideImage(shared.uploadData.id)}
+                    />
+                <div className="p-3">
                     <p className="text-sm text-gray-700">{shared.uploadData.description}</p>
-                    </div>
+                </div>
 
                 </div>
             ))}

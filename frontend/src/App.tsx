@@ -14,15 +14,15 @@ function App() {
   return (
     <Router>
       <Routes>
+
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/upload" element={<UploadPage />} />
         <Route path="/allPhotos" element={<AllPhotos />} />
         <Route path="/allPhotos/photo/:id" element={<InsideImage />} />
-        <Route path="/sharedByYou" element={<SharedPhotosPage />}></Route>
-      
-        
+        <Route path="/sharedByYou" element={<SharedPhotosPage />}></Route>  
+        <Route path="/sharedByYou/photo/:id" element={<InsideImage />} />   
         
       </Routes>
     </Router>
