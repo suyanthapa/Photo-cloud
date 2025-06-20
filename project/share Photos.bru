@@ -5,19 +5,20 @@ meta {
 }
 
 post {
-  url: http://localhost:8000/api/data/share
+  url: http://localhost:8000/api/data/share/sharePhoto
   body: json
   auth: inherit
 }
 
 headers {
-  Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjksImlhdCI6MTc0OTU4NjIwNiwiZXhwIjoxNzUwMTkxMDA2fQ.gyhXUoRH2X47mDrXWLyWx4cI8t7QJUocVMuUMYIZpxg
+  Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1MDM0OTA0MiwiZXhwIjoxNzUwOTUzODQyfQ.PGoC-Z4r5OfggV0NtRwq1Pj15J0kQQ2vRLGxlljRE70
 }
 
 body:json {
   {
-    "id": 27
-   
+    "receiverId": 3,
+    "photoId": 1
+     
   
   }
 }

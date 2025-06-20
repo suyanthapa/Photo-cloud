@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: http://localhost:8000/api/data/share/sharePhoto
+  url: http://localhost:8000/api/data/share/viewSharedPhotos
   body: json
   auth: inherit
 }
@@ -17,7 +17,7 @@ headers {
 body:json {
   {
     "receiverId": 1,
-    "photoId": 1
+    "photoId": 3
    
   
   }
