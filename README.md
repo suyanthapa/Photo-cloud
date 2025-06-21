@@ -45,12 +45,6 @@ A full-stack photo sharing web application that allows users to securely registe
 
 ---
 
-## 📷 Screenshots
-
-> _Add screenshots here if you want visual previews_  
-> Example: Home screen, photo upload page, shared photo section (planned)
-
----
 
 ## ⚙️ Installation & Setup
 
