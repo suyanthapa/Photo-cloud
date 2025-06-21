@@ -237,7 +237,12 @@ const viewSingleData = async (req: IRequest, res: Response):Promise <void> => {
        return;
     }
 
-    const deleteData = await client.uploadData.delete({
+    // First delete the references
+        await client.userSharedPhotos.deleteMany({
+          where: { uploadDataId: uploadedId }
+        });
+
+      const deleteData = await client.uploadData.delete({
       where: {
         id: uploadedId
       }

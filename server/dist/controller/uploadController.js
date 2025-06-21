@@ -195,6 +195,10 @@ const deleteData = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             res.status(404).json({ error: "not found any data with this document id" });
             return;
         }
+        // First delete the references
+        yield client.userSharedPhotos.deleteMany({
+            where: { uploadDataId: uploadedId }
+        });
         const deleteData = yield client.uploadData.delete({
             where: {
                 id: uploadedId
