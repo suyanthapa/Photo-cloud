@@ -58,4 +58,5 @@ A full-stack photo sharing web application that allows users to securely registe
 
 ```bash
 git clone https://github.com/suyanthapa/Photo-cloud.git
-cd Photo-cloud
+cd frontend
+npm run dev
