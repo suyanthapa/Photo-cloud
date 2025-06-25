@@ -14,29 +14,35 @@ const client = new client_1.PrismaClient();
 const sharePhoto = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.userId;
-        const { receiverId, photoId } = req.body;
-        const existingUser = yield client.user.findUnique({
+        const { receiverEmail, photoId } = req.body;
+        // const existingUser = await client.user.findUnique({
+        //    where: {
+        //       id: Number(receiverId)
+        //      },
+        //   }); 
+        const receiverUser = yield client.user.findUnique({
             where: {
-                id: Number(receiverId)
+                email: receiverEmail
             },
         });
         //CHECK USER EXISTS OR NOT
-        if (!existingUser) {
+        if (!receiverUser) {
             res.status(400).json({ error: "User doesnot exist" });
             return;
         }
-        console.log("Receiver id is", receiverId);
+        console.log("Receiver id is", receiverUser === null || receiverUser === void 0 ? void 0 : receiverUser.id);
         console.log("Mine id is", userId);
         //check photo exists or not
         const photo = yield client.uploadData.findFirst({
             where: { id: photoId }
         });
-        if ((photo === null || photo === void 0 ? void 0 : photo.userId) !== userId) {
+        if ((photo === null || photo === void 0 ? void 0 : photo.userId) !== Number(userId)) {
             res.status(400).json({
                 error: "Respective Photo doesnot exist"
             });
+            return;
         }
-        if (receiverId === userId) {
+        if (receiverUser.id == Number(userId)) {
             res.status(400).json({
                 error: "Photos can't be shared to yourself.. "
             });
@@ -45,7 +51,7 @@ const sharePhoto = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const alreadyShared = yield client.userSharedPhotos.findUnique({
             where: {
                 userId_uploadDataId: {
-                    userId: receiverId,
+                    userId: receiverUser.id,
                     uploadDataId: photoId
                 }
             }
@@ -58,7 +64,7 @@ const sharePhoto = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         //share photo to other
         const sharePhoto = yield client.userSharedPhotos.create({
             data: {
-                userId: receiverId,
+                userId: receiverUser.id,
                 uploadDataId: photoId
             }
         });

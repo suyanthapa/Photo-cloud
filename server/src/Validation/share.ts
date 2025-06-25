@@ -5,9 +5,10 @@ const shareValidation =  {
     sharePhoto : {
 
         body: Joi.object({
-            receiverId : Joi.number().required().messages({
-                'any.required': 'Receiver Id is required'
-            }),
+            receiverEmail: Joi.string().email().required().messages({
+              'any.required': 'Email is required',
+               'string.email': 'Invalid email format',
+             }),
 
              photoId : Joi.number().required().messages({
                 'any.required': 'Photo Id is required'

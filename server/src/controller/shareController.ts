@@ -4,38 +4,45 @@ import { Request, Response } from "express";
 const client = new PrismaClient();
 
 const sharePhoto = async (req: IRequest, res: Response): Promise <void> => {
-
     try{
           const userId = req.userId;
-    const { receiverId, photoId} = req.body;
+    const { receiverEmail, photoId} = req.body;
 
-    const existingUser = await client.user.findUnique({
+    // const existingUser = await client.user.findUnique({
+    //    where: {
+    //       id: Number(receiverId)
+    //      },
+    //   }); 
+
+      const receiverUser = await client.user.findUnique({
        where: {
-          id: Number(receiverId)
+          email: receiverEmail
          },
       }); 
       //CHECK USER EXISTS OR NOT
-      if(!existingUser){
+      if(!receiverUser){
          res.status(400).json({ error: "User doesnot exist" });
         return;
       }
-      console.log("Receiver id is", receiverId);
-        console.log("Mine id is", userId);
 
-          //check photo exists or not
+      console.log("Receiver id is", receiverUser?.id);
+      console.log("Mine id is", userId);
+
+      //check photo exists or not
       const photo = await client.uploadData.findFirst({
        where:
        { id: photoId }
       })
 
-      
-      if(photo?.userId !== userId){
+      if(photo?.userId !== Number(userId)) {
+
         res.status(400).json({
             error: "Respective Photo doesnot exist"
         })
+        return
       }
 
-        if(receiverId===userId){
+        if(receiverUser.id == Number(userId)){
         res.status(400).json({
             error: "Photos can't be shared to yourself.. "
         })
@@ -44,7 +51,7 @@ const sharePhoto = async (req: IRequest, res: Response): Promise <void> => {
       const alreadyShared = await client.userSharedPhotos.findUnique({
         where: {
             userId_uploadDataId: {
-                userId: receiverId,
+                userId: receiverUser.id,
                 uploadDataId: photoId
             }
         }
@@ -59,7 +66,7 @@ const sharePhoto = async (req: IRequest, res: Response): Promise <void> => {
         //share photo to other
      const sharePhoto = await client.userSharedPhotos.create({
         data: {
-            userId: receiverId,
+            userId: receiverUser.id,
             uploadDataId: photoId
         }
       })
@@ -127,13 +134,7 @@ const viewSharedPhotos = async (req: IRequest, res: Response): Promise <void> =>
             }
         }
       }
-
-
-           
-       
-        
       })
-
       res.status(200).json({
         message: "Views ",
         data: viewSharedPhotos

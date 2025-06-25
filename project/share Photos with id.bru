@@ -1,5 +1,5 @@
 meta {
-  name: share Photos
+  name: share Photos with id
   type: http
   seq: 9
 }
@@ -11,15 +11,13 @@ post {
 }
 
 headers {
-  Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1MDM0OTA0MiwiZXhwIjoxNzUwOTUzODQyfQ.PGoC-Z4r5OfggV0NtRwq1Pj15J0kQQ2vRLGxlljRE70
+  Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1MDQyNTM3MywiZXhwIjoxNzUxMDMwMTczfQ.xEtXt3N6gi72qFv90VnLXz6dle755EfT-ecBwDN5beI
 }
 
 body:json {
   {
-    "receiverId": 3,
-    "photoId": 1
-     
-  
+    "receiverEmail": "newuser@gmail.com",
+    "photoId": 5
   }
 }
 

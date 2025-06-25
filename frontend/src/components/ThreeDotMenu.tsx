@@ -28,7 +28,6 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
     
     setOpen(false);
 
-
   }
 
   const handleDelete = async () => {

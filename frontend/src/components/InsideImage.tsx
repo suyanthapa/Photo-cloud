@@ -11,7 +11,6 @@ import {Pencil} from "lucide-react";
     createdAt: string
    }
 
-
 const InsideImage: React.FC = () => {
    
   const { id} = useParams<{id: string}>();
@@ -44,8 +43,8 @@ const InsideImage: React.FC = () => {
         err.response?.data?.error ||
         'Failed to load data.'
       );
-    }     }
-
+    } 
+  }
      if (id) {
       fetchPhoto();
     }
@@ -109,19 +108,40 @@ const InsideImage: React.FC = () => {
   const handleShare = async () => {
     setShared(true);
 
+   
+
   }
 
   const handleShareData = async () => {
-    try{
+     try{
+      console.log("Payload", {
+  receiverEmail: sharedGmail,
+  photoId: photoData.id
+});
 
+console.log("type",typeof sharedGmail); // should log: number
+
+      const res = await axios.post(
+            "http://localhost:8000/api/data/share/sharePhoto",
+         {
+          receiverEmail: sharedGmail,
+          photoId: (photoData.id) 
+        },
+        {withCredentials: true}
+
+      )
+      console.log(res)
+      setMessage(res.data.message);
     }
-    catch (err:any){
-       setMessage(
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        'Failed to share data .'
-      );
-    }
+catch (err: any) {
+  console.log("Error response:", err.response?.data);
+  setMessage(
+    err.response?.data?.message ||
+    err.response?.data?.error ||
+    'Failed to share data.'
+  );
+}
+
   }
 
   return (
@@ -212,6 +232,19 @@ const InsideImage: React.FC = () => {
                     >
                       Share
                     </button>
+
+                    {message && (
+                    <div
+                    className={`text-center px-4 py-2 mt-2 rounded-md text-sm font-semibold ${
+                      message.toLowerCase().includes("success")
+                        ? "text-green-700 bg-green-100"
+                        : "text-red-700 bg-red-100"
+                    }`}
+                  >
+                    {message}
+                  </div>
+                    )}
+
                   </div>
                 ) : null}
               </div>

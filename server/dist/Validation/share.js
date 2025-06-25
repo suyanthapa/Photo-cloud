@@ -7,8 +7,9 @@ const joi_1 = __importDefault(require("joi"));
 const shareValidation = {
     sharePhoto: {
         body: joi_1.default.object({
-            receiverId: joi_1.default.number().required().messages({
-                'any.required': 'Receiver Id is required'
+            receiverEmail: joi_1.default.string().email().required().messages({
+                'any.required': 'Email is required',
+                'string.email': 'Invalid email format',
             }),
             photoId: joi_1.default.number().required().messages({
                 'any.required': 'Photo Id is required'
