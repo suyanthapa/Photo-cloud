@@ -16,11 +16,14 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const getUserfromAuthToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     try {
+        //  let token = req.headers['authorization']?.replace('Bearer ', '');
         let token = req.cookies.uid;
+        console.log("token", token);
         if (!token) {
-            token = (_a = req.headers['authorization']) === null || _a === void 0 ? void 0 : _a.replace('Bearer ', '');
+            const authHeader = req.headers["authorization"];
+            token = authHeader === null || authHeader === void 0 ? void 0 : authHeader.replace("Bearer ", "");
+            //   token = req.headers['authorization']?.replace('Bearer ', '');
         }
         if (!token) {
             res.status(401).json({ message: "No token provided" });

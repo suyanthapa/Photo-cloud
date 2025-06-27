@@ -10,4 +10,7 @@ sharedRouter.post('/sharePhoto', getUserfromAuthToken,  validate(shareValidation
 
 
 sharedRouter.get('/viewSharedPhotos', getUserfromAuthToken,shareController.viewSharedPhotos);
+
+
+sharedRouter.get('/sharedPhotos', getUserfromAuthToken,shareController.sharedToMe);
 export default sharedRouter;

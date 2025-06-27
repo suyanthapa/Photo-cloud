@@ -137,8 +137,59 @@ const viewSharedPhotos = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
     }
 });
+const sharedToMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const loggedInUser = Number(req.userId);
+        const existingUser = yield client.user.findUnique({
+            where: {
+                id: Number(loggedInUser)
+            },
+        });
+        //CHECK USER EXISTS OR NOT
+        if (!existingUser) {
+            res.status(400).json({ error: "User doesnot exist" });
+            return;
+        }
+        const photosSharedToMe = yield client.userSharedPhotos.findMany({
+            where: {
+                userId: loggedInUser
+            },
+            select: {
+                uploadData: {
+                    select: {
+                        id: true,
+                        photo: true,
+                        description: true,
+                        createdAt: true,
+                        user: {
+                            select: {
+                                id: true,
+                                username: true
+                            },
+                        },
+                    },
+                },
+            },
+        });
+        res.status(200).json({
+            message: "Photos shared to you",
+            data: photosSharedToMe.map((item) => item.uploadData),
+        });
+        return;
+    }
+    catch (e) {
+        console.error("Upload error:", e);
+        if (e instanceof Error) {
+            res.status(500).json({ message: e.message });
+        }
+        else {
+            res.status(500).json({ message: "An unknown error occurred" });
+        }
+    }
+});
 const shareController = {
     sharePhoto,
-    viewSharedPhotos
+    viewSharedPhotos,
+    sharedToMe
 };
 exports.default = shareController;

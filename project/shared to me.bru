@@ -1,0 +1,29 @@
+meta {
+  name: shared to me
+  type: http
+  seq: 11
+}
+
+get {
+  url: http://localhost:8000/api/data/share/sharedToMe
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1MDgzOTY3MSwiZXhwIjoxNzUxNDQ0NDcxfQ.UStZW9mfT-mHU-8d9rh0eluLEUjACG6q6O0SPVhIb0I
+}
+
+body:json {
+  {
+    "receiverId": 1,
+    "photoId": 3
+   
+  
+  }
+}
+
+body:multipart-form {
+  photo: @file(C:\Users\user\Downloads\profile-pic (4).png)
+  description: hello OK
+}

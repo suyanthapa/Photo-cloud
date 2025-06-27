@@ -20,11 +20,12 @@ export default function Navbar() {
           <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/dashboard">Home</Link>
           <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/upload">Upload</Link>
            <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/allPhotos">All Photos</Link>
+             <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/sharedWithMe">Shared to me</Link>
           <a className="text-[#0d151c] text-sm font-medium leading-normal" href="/sharedByYou">Shared By You</a>
         </div>
         <div className="flex gap-2">
          
-          <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#e7eef4] text-[#0d151c] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+          <button className="flex max-w-[480px]  cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#e7eef4] text-[#0d151c] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
             <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
               <path d="M200,40H56A16,16,0,0,0,40,56V200a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm0,80H136V56h64ZM120,56v64H56V56ZM56,136h64v64H56Zm144,64H136V136h64v64Z" />
             </svg>

@@ -11,11 +11,17 @@ const getUserfromAuthToken = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+   
+    //  let token = req.headers['authorization']?.replace('Bearer ', '');
     let token = req.cookies.uid;
+     
+      console.log("token", token)
 
     if (!token) {
+        const  authHeader = req.headers["authorization"];
+       token = authHeader?.replace("Bearer ", "");
+    //   token = req.headers['authorization']?.replace('Bearer ', '');
         
-      token = req.headers['authorization']?.replace('Bearer ', '');
     }
 
     if (!token) {

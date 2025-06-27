@@ -6,6 +6,8 @@ import UploadPage from './pages/upload';
 import AllPhotos from './pages/AllPhotos';
 import InsideImage from './components/InsideImage';
 import SharedPhotosPage from './pages/SharedByYou';
+import SharedWithMe from './pages/sharedWithMe';
+import ViewSharedPhoto from './components/viewSharedPhoto';
 
 
 
@@ -22,7 +24,9 @@ function App() {
         <Route path="/allPhotos" element={<AllPhotos />} />
         <Route path="/allPhotos/photo/:id" element={<InsideImage />} />
         <Route path="/sharedByYou" element={<SharedPhotosPage />}></Route>  
-        <Route path="/sharedByYou/photo/:id" element={<InsideImage />} />   
+        <Route path="/sharedByYou/photo/:id" element={<InsideImage />} />  
+        <Route path="/sharedWithMe" element={<SharedWithMe />} />   
+        <Route path="/sharedWithMe/photo/:id" element={<ViewSharedPhoto />} />  
         
       </Routes>
     </Router>
