@@ -9,6 +9,9 @@ interface ReceivedData {
   description: string;
   photo: string;
   createdAt: string;
+ user : {
+     email : string
+ }
 }
 
 const SharedWithMe: React.FC = () => {
@@ -78,10 +81,13 @@ const SharedWithMe: React.FC = () => {
                         <p className="text-sm text-gray-500">
                           {formatDate(received.createdAt)}
                         </p>
+                        <p className="text-sm text-gray-500">
+                         Shared By :  {received.user.email}
+                        </p>
                       </div>
                       {/* Just render the ThreeDotMenu component */}
                       <ThreeDotMenu uploadedId={received.id} />
-                    
+
                     </div>
                   </div>
                 </div>

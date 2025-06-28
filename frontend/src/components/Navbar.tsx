@@ -20,7 +20,7 @@ export default function Navbar() {
           <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/dashboard">Home</Link>
           <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/upload">Upload</Link>
            <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/allPhotos">All Photos</Link>
-             <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/sharedWithMe">Shared to me</Link>
+             <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/sharedWithMe">Shared With Me</Link>
           <a className="text-[#0d151c] text-sm font-medium leading-normal" href="/sharedByYou">Shared By You</a>
         </div>
         <div className="flex gap-2">

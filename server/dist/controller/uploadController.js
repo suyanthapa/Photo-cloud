@@ -102,6 +102,13 @@ const viewSingleData = (req, res) => __awaiter(void 0, void 0, void 0, function*
         const data = yield client.uploadData.findFirst({
             where: {
                 id: Number(id)
+            },
+            include: {
+                user: {
+                    select: {
+                        email: true
+                    }
+                }
             }
         });
         if ((data === null || data === void 0 ? void 0 : data.id) !== Number(id)) {
@@ -179,49 +186,35 @@ const editData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 //DELETE DATA
 const deleteData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("suyan");
         const userId = req.userId;
         const { uploadedId } = req.body;
-        // const uploadedId = Number(req.body.uploadedId);
         console.log("Received uploadedId:", uploadedId);
-        //CHECK WHETHERE THE UPLOADED USER IS SAME OR NOT
+        // Verify that the photo belongs to the logged-in user
         const verifyUser = yield client.uploadData.findFirst({
             where: {
                 userId: Number(userId),
-                id: uploadedId
-            }
+                id: uploadedId,
+            },
         });
         if (!verifyUser) {
-            res.status(404).json({ error: "not found any data with this document id" });
+            res.status(404).json({ error: "No data found with this document ID" });
             return;
         }
-        // First delete the references
-        yield client.userSharedPhotos.deleteMany({
-            where: { uploadDataId: uploadedId }
-        });
-        const deleteData = yield client.uploadData.delete({
+        const deleted = yield client.uploadData.delete({
             where: {
-                id: uploadedId
-            }
+                id: uploadedId,
+            },
         });
-        if (!deleteData) {
-            res.status(404).json({ error: " Error while deleting the data " });
-            return;
-        }
         res.status(200).json({
             message: "Deleted Successfully",
-            DocumentId: uploadedId
+            documentId: uploadedId,
         });
-        return;
     }
     catch (e) {
-        console.error(" Deleted Data Error:", e);
-        if (e instanceof Error) {
-            res.status(500).json({ message: e.message });
-        }
-        else {
-            res.status(500).json({ message: "An unknown erro occured" });
-        }
+        console.error("Delete Data Error:", e);
+        res.status(500).json({
+            message: e instanceof Error ? e.message : "An unknown error occurred",
+        });
     }
 });
 const uploadController = {

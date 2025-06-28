@@ -118,6 +118,13 @@ const viewSingleData = async (req: IRequest, res: Response):Promise <void> => {
       const data = await client.uploadData.findFirst({
         where: {
           id : Number(id)
+        },
+        include: {
+          user: {
+            select : {
+              email: true
+            }
+          }
         }
       })
 
@@ -214,65 +221,44 @@ const viewSingleData = async (req: IRequest, res: Response):Promise <void> => {
     }
 
 //DELETE DATA
-    const deleteData = async (req: IRequest, res: Response) :Promise <void> =>{
+   const deleteData = async (req: IRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.userId;
+    const { uploadedId } = req.body;
 
-      try{
-        console.log("suyan")
-        const userId = req.userId;
+    console.log("Received uploadedId:", uploadedId);
 
-        const {uploadedId} = req.body;
-      // const uploadedId = Number(req.body.uploadedId);
-       console.log("Received uploadedId:", uploadedId);
-
-         //CHECK WHETHERE THE UPLOADED USER IS SAME OR NOT
-      const verifyUser = await client.uploadData.findFirst({
-        where: {
-          userId : Number(userId),
-          id : uploadedId
-        }
-      })
-
-      if (!verifyUser) {
-       res.status(404).json({ error: "not found any data with this document id" });
-       return;
-    }
-
-    // First delete the references
-        await client.userSharedPhotos.deleteMany({
-          where: { uploadDataId: uploadedId }
-        });
-
-      const deleteData = await client.uploadData.delete({
+    // Verify that the photo belongs to the logged-in user
+    const verifyUser = await client.uploadData.findFirst({
       where: {
-        id: uploadedId
-      }
-    })
+        userId: Number(userId),
+        id: uploadedId,
+      },
+    });
 
-     if (!deleteData) {
-       res.status(404).json({ error: " Error while deleting the data " });
-       return;
+    if (!verifyUser) {
+      res.status(404).json({ error: "No data found with this document ID" });
+      return;
     }
 
-      res.status(200).json({
-        message: "Deleted Successfully",
-        DocumentId : uploadedId
+    const deleted = await client.uploadData.delete({
+      where: {
+        id: uploadedId,
+      },
+    });
 
-      })
+    res.status(200).json({
+      message: "Deleted Successfully",
+      documentId: uploadedId,
+    });
+  } catch (e: unknown) {
+    console.error("Delete Data Error:", e);
+    res.status(500).json({
+      message: e instanceof Error ? e.message : "An unknown error occurred",
+    });
+  }
+};
 
-      return
-
-      }
-      catch (e:unknown){
-      console.error(" Deleted Data Error:",e);
-
-          if(e instanceof Error){
-            res.status(500).json({ message: e.message});
-          }
-          else{
-            res.status(500).json({message: "An unknown erro occured"})
-          }
-      }
-    }
 const uploadController = {
     uploadData,
     viewUploadedData,

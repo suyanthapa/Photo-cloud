@@ -16,8 +16,7 @@ model User {
   email         String        @unique
   createdAt     DateTime      @default(now())
 
-  uploads       uploadData[]  @relation("OwnerUploads")      // Photos the user uploaded
-  sharedPhotos  UserSharedPhotos[]                           // Join records for photos shared with the user
+  uploads       uploadData[]  @relation("OwnerUploads")
 }
 
 model uploadData {
@@ -29,15 +28,6 @@ model uploadData {
   userId      Int
   user        User      @relation("OwnerUploads", fields: [userId], references: [id])
 
-  sharedWith  UserSharedPhotos[]                            // Join records for users this photo is shared with
+  sharedWith  Int[]     @default([]) // ✅ Important!
 }
 
-model UserSharedPhotos {
-  userId       Int
-  uploadDataId Int
-  
-  user         User       @relation(fields: [userId], references: [id])
-  uploadData   uploadData @relation(fields: [uploadDataId], references: [id])
-
-  @@id([userId, uploadDataId]) // Composite primary key
-}
