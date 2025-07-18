@@ -4,6 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Login :React.FC = () => {
 
+  console.log('API URL:', import.meta.env.VITE_API_URL);
+
+
    const apiBaseUrl = import.meta.env.VITE_API_URL;
 
     const [formData, setFormData] = useState({
