@@ -80,8 +80,8 @@ const login = async ( req: Request, res: Response): Promise<void> =>{
     
     res.cookie('uid', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // true on https only
-      sameSite: 'lax', // or 'none' if cross-site needed with secure
+      secure: true, // true on https only
+      sameSite: 'none',
     });
 
       res.status(201).json({
