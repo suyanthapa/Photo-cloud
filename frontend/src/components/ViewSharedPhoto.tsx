@@ -21,12 +21,14 @@ const ViewSharedPhoto: React.FC = () => {
   const [sharedGmail, setSharedGmail] = useState("");
   const [shared, setShared] = useState(false);
 
+   const apiBaseUrl = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const fetchPhoto = async () => {
       try {
         console.log("response vanda mathi");
         const res = await axios.get(
-          `http://localhost:8000/api/data/viewSingleData/${id}`,
+          `${apiBaseUrl}/api/data/viewSingleData/${id}`,
           {
             withCredentials: true,
           }
@@ -75,7 +77,7 @@ const ViewSharedPhoto: React.FC = () => {
       });
 
       const res = await axios.post(
-        "http://localhost:8000/api/data/share/sharePhoto",
+        `${apiBaseUrl}/api/data/share/sharePhoto`,
         {
           receiverEmail: sharedGmail,
           photoId: photoData.id,

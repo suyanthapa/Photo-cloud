@@ -29,11 +29,12 @@ const SharedPhotosPage = () => {
   const [sharedPhotos, setSharedPhotos] = useState<GroupedSharedPhoto[]>([]);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+   const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   const fetchSharedData = async () => {
     try {
       const res = await axios.get<{ data: RawSharedItem[] }>(
-        "http://localhost:8000/api/data/share/viewSharedPhotos",
+        `${apiBaseUrl}/api/data/share/viewSharedPhotos`,
         {
           withCredentials: true,
         }
@@ -106,7 +107,7 @@ const SharedPhotosPage = () => {
                   onClick={() => handleInsideImage(photo.id)}
                 >
                   <img
-                    src={`http://localhost:8000/uploads/${photo.photo}`}
+                    src={`${apiBaseUrl}/uploads/${photo.photo}`}
                     alt={photo.description || "Uploaded photo"}
                     className="w-full h-48 object-cover rounded-t-lg"
                   />

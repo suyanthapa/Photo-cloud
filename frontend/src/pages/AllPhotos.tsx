@@ -14,11 +14,12 @@ interface UploadedData {
 const AllPhotos: React.FC = () => {
   const [uploads, setUploads] = useState<UploadedData[]>([]);
   const navigate = useNavigate();
+   const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   const fetchUploads = async () => {
     try {
       const res = await axios.get<{ data: UploadedData[] }>(
-        "http://localhost:8000/api/data/viewData",
+        `${apiBaseUrl}/api/data/viewData`,
         {
           withCredentials: true,
         }

@@ -9,12 +9,13 @@ const Register: React.FC = () => {
     password: ''
   });
   const [message, setMessage] = useState('');
+   const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      const res = await axios.post('http://localhost:8000/api/auth/register', formData);
+      const res = await axios.post(`${apiBaseUrl}/api/auth/register`, formData);
       setMessage('Registration successful!');
       console.log(res.data);
     } catch (err: any) {

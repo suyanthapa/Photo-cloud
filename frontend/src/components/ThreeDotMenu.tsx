@@ -10,6 +10,8 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
    const [message, setMessage] = useState('');
+
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
   
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
       }
       console.log("Handle confirm Delete ------ID returned is :",uploadedId)
         const res = await axios.delete(
-        'http://localhost:8000/api/data/deleteData',config
+        `${apiBaseUrl}/api/data/deleteData`,config
       );
       window.location.reload();
       

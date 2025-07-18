@@ -17,11 +17,12 @@ interface ReceivedData {
 const SharedWithMe: React.FC = () => {
   const [received, setReceived] = useState<ReceivedData[]>([]);
   const navigate = useNavigate();
+   const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   const fetchUploads = async () => {
     try {
       const res = await axios.get<{ data: ReceivedData[] }>(
-        "http://localhost:8000/api/data/share/sharedPhotos",
+        `${apiBaseUrl}/api/data/share/sharedPhotos`,
         {
           withCredentials: true,
         }
@@ -67,7 +68,7 @@ const SharedWithMe: React.FC = () => {
                   className="bg-white rounded-lg shadow-md relative"
                   >
                   <img
-                    src={`http://localhost:8000/uploads/${received.photo}`}
+                    src={`${apiBaseUrl}/uploads/${received.photo}`}
                     alt={received.description || "Uploaded photo"}
                     className="w-full h-48 object-cover"
                     onClick={()=> handleInsideImage(received.id)}

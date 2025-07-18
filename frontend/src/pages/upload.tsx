@@ -15,6 +15,8 @@ const UploadPage: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [uploads, setUploads] = useState<UploadedData[]>([]);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+
+  const apiBaseUrl = "import.meta.env.VITE_API_URL";
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -66,7 +68,7 @@ const UploadPage: React.FC = () => {
     formData.append('description', description);
 
     try {
-      const res = await axios.post('http://localhost:8000/api/data/upload', formData, {
+      const res = await axios.post(`${apiBaseUrl}/api/data/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -92,7 +94,7 @@ const UploadPage: React.FC = () => {
 
   const fetchUploads = async () => {
     try {
-      const res = await axios.get<{ data: UploadedData[] }>('http://localhost:8000/api/data/viewData', {
+      const res = await axios.get<{ data: UploadedData[] }>(`${apiBaseUrl}/api/data/viewData`, {
         withCredentials: true,
       });
       setUploads(res.data.data);
