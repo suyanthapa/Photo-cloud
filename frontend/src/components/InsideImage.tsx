@@ -73,13 +73,14 @@ const InsideImage: React.FC = () => {
   const handleSave = async () => {
     try{
       const res = await axios.put(
-        "http://localhost:8000/api/data/editData",
+        `${apiBaseUrl}/api/data/editData`,
                {
           uploadedId: photoData.id,
           description: editedDescription
         },
          {withCredentials: true}
       );
+      console.log(res.data);
       setPhotoData((prev) =>
         prev? {...prev,description: editedDescription} : prev
       );

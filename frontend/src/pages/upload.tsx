@@ -72,6 +72,7 @@ const UploadPage: React.FC = () => {
         },
         withCredentials: true, 
       });
+      console.log(res.data)
       alert('Upload successful');
       
       // Reset form

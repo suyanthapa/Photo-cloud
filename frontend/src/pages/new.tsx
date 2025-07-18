@@ -41,6 +41,7 @@ const Dashboard: React.FC = () => {
         },
         withCredentials: true, 
       });
+      console.log(res.data);
       alert('Upload successful');
       setDescription('');
       setFile(null);

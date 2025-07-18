@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import  { useState, useRef, useEffect } from "react";
 import { MoreVertical } from "lucide-react";
 import axios, { type AxiosRequestConfig } from "axios";
 
@@ -98,6 +98,13 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
           </div>
         )}
       </div>
+
+      {/* Display message */}
+    {message && (
+      <div className="mt-2 text-sm text-red-600 text-center">
+        {message}
+      </div>
+    )}
 
       {/* Fullscreen Confirmation Modal */}
       {showConfirmModal && (

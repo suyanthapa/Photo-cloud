@@ -17,12 +17,12 @@ const getUserfromAuthToken = async (
      
       console.log("token", token)
 
-    if (!token) {
-        const  authHeader = req.headers["authorization"];
-       token = authHeader?.replace("Bearer ", "");
-    //   token = req.headers['authorization']?.replace('Bearer ', '');
+    // if (!token) {
+    //     const  authHeader = req.headers["authorization"];
+    //    token = authHeader?.replace("Bearer ", "");
+    // //   token = req.headers['authorization']?.replace('Bearer ', '');
         
-    }
+    // }
 
     if (!token) {
       res.status(401).json({ message: "No token provided" });
