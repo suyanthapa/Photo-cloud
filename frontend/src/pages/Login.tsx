@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Login :React.FC = () => {
 
-   const apiBaseUrl = import.meta.env.VITE_API_URL;
+   const apiBaseUrl = "https://photo-cloud-2.onrender.com";
 
     const [formData, setFormData] = useState({
         email : '',
