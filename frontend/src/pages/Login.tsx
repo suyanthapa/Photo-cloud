@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Login :React.FC = () => {
 
+   const apiBaseUrl = import.meta.env.VITE_API_URL;
+
     const [formData, setFormData] = useState({
         email : '',
         password: ''
@@ -19,7 +21,7 @@ const Login :React.FC = () => {
     try{
       console.log("LKogin try bata open vayo")
          const res = await axios.post(
-          'http://localhost:8000/api/auth/login',
+          `${apiBaseUrl}/api/auth/login`,
           formData,
           {withCredentials: true}
         );

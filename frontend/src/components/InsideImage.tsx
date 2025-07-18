@@ -20,6 +20,8 @@ const InsideImage: React.FC = () => {
   const [editedDescription, setEditedDescription] = useState('');
   const [sharedGmail, setSharedGmail] = useState('');
   const [shared, setShared]  = useState(false)
+
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
   
 
   useEffect(()=>{
@@ -28,7 +30,7 @@ const InsideImage: React.FC = () => {
       try{
         console.log("response vanda mathi")
         const res = await axios.get(
-          `http://localhost:8000/api/data/viewSingleData/${id}`,
+          `${apiBaseUrl}/api/data/viewSingleData/${id}`,
            {
           withCredentials: true,
             }
