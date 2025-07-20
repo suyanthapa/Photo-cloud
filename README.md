@@ -149,6 +149,9 @@ npx prisma generate
 
 ---
 
+## 📝 Notes
+This project was initially developed and tested locally. After switching to deployed backend and database services, some features required adjustment to work smoothly in the production environment. If you encounter any issues, please ensure environment variables and CORS settings are correctly configured.
+
 ## 🙏 Acknowledgments
 
 - Thanks to the Prisma, Cloudinary, Render, Vercel, and Neon communities for their awesome tools and support.
