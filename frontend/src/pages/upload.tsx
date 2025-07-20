@@ -16,7 +16,7 @@ const UploadPage: React.FC = () => {
   const [uploads, setUploads] = useState<UploadedData[]>([]);
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
-  const apiBaseUrl = "import.meta.env.VITE_API_URL";
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
