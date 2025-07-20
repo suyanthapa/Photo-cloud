@@ -8,9 +8,8 @@ import getUserfromAuthToken from '../Middleware/jwtfromUser';
 
 const uploadRouter = express.Router();
 
-export const userUpload = upload.fields([
-    {name: 'photo', maxCount: 1}
-]);
+export const userUpload = upload.single('photo');
+
 
 
 //Upload  User Photo
