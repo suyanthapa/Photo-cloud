@@ -195,7 +195,7 @@ const UploadPage: React.FC = () => {
               {uploads.map((upload) => (
                 <div key={upload.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                  <img
-                  src={`http://localhost:8000/uploads/${upload.photo}`}
+                  src={`${apiBaseUrl}/uploads/${upload.photo}`}
                   alt={upload.description}
                   className="w-full h-48 object-cover"
                 />
