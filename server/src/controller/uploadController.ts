@@ -10,6 +10,15 @@ const uploadData = async (req: IRequest, res: Response): Promise<void> => {
   try {
     const userId = req.userId;
     const photo = req.file as Express.Multer.File;
+
+    if (!photo) {
+  res.status(400).json({ message: "No file uploaded." });
+  return;
+}
+
+// Now TypeScript knows photo is defined
+const photoUrl = photo.path;  // photo.path is full Cloudinary URL
+
     const { description } = req.body;
 
     console.log("body is", req.body);
