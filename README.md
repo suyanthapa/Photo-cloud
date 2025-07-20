@@ -68,15 +68,6 @@ cd Photo-cloud
 cd backend
 ```
 
-- Create a `.env` file with the following environment variables (replace values with your own):
-
-```env
-DATABASE_URL=your_neon_database_url
-CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-JWT_SECRET=your_jwt_secret
-```
 
 - Install dependencies:
 
@@ -131,7 +122,7 @@ npm run dev
 
 ### Live Demo
 
-Check out the live app at: [https://photo-cloud-zeta.vercel.app/live](https://photo-cloud-zeta.vercel.app/live)
+Check out the live app at: [https://photo-cloud-zeta.vercel.app/live](https://photo-cloud-zeta.vercel.app/)
 
 ---
 
@@ -139,7 +130,7 @@ Check out the live app at: [https://photo-cloud-zeta.vercel.app/live](https://ph
 
 ```
 Photo-cloud/
-├── backend/           # Express API server with Prisma & Cloudinary integration
+├── server/           # Express API server with Prisma & Cloudinary integration
 ├── frontend/          # React frontend using Vite & Tailwind CSS
 ├── README.md          # Project documentation (this file)
 ```
