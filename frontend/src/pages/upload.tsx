@@ -187,7 +187,7 @@ const UploadPage: React.FC = () => {
           {isUploading ? 'Uploading...' : 'Upload'}
         </button>
 
-        {/* Uploaded Photos Display */}
+        Uploaded Photos Display
         {uploads.length > 0 && (
           <div className="mt-12">
             <h2 className="text-xl font-bold mb-6">Your Uploaded Photos</h2>
