@@ -63,7 +63,7 @@ const Login :React.FC = () => {
             />
           </div>
           <div className="mb-6">
-            <label className="block mb-1 text-sm font-medium">Password</label>
+            <label className="block mb-1 text-sm font-medium">Password :Y</label>
             <input 
                 type="password" 
                 className="w-full px-3 py-2 border rounded" 
