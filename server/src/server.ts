@@ -12,7 +12,7 @@ dotenv.config();
 const server = express();
 
 server.use(express.json());
-server.use(cors({ origin: 'https://photo-cloud-96ek9xnv4-suyanthapas-projects.vercel.app', credentials: true}))
+server.use(cors({ origin: 'https://photo-cloud-delta.vercel.app', credentials: true}))
 
 server.use('/uploads', express.static(path.join(__dirname, '../public/assets/documents/photo')));
 
