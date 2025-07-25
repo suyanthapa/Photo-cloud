@@ -16,8 +16,8 @@ const uploadData = async (req: IRequest, res: Response): Promise<void> => {
   return;
 }
 
-// Now TypeScript knows photo is defined
-const photoUrl = photo.path;  // photo.path is full Cloudinary URL
+    // Now TypeScript knows photo is defined
+    const photoUrl = (photo as any).path;  // photo.path is full Cloudinary URL
 
     const { description } = req.body;
 
@@ -38,7 +38,7 @@ const photoUrl = photo.path;  // photo.path is full Cloudinary URL
 
     const upload = await client.uploadData.create({
       data: {
-        photo: photo.path, // Cloudinary gives you a full URL here
+        photo: photoUrl, // Cloudinary gives you a full URL here
         description,
         userId: Number(userId),
       },
