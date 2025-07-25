@@ -65,7 +65,7 @@ const AllPhotos: React.FC = () => {
                   className="bg-white rounded-lg shadow-md relative"
                   >
                   <img
-                    src={`${apiBaseUrl}/uploads/${upload.photo}`}
+                    src={upload.photo}
                     alt={upload.description || "Uploaded photo"}
                     className="w-full h-48 object-cover"
                     onClick={()=> handleInsideImage(upload.id)}
