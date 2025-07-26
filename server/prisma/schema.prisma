@@ -1,7 +1,5 @@
-
 generator client {
   provider = "prisma-client-js"
- 
 }
 
 datasource db {
@@ -10,24 +8,36 @@ datasource db {
 }
 
 model User {
-  id            Int           @id @default(autoincrement())
-  username      String        @unique
-  password      String
-  email         String        @unique
-  createdAt     DateTime      @default(now())
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  email     String   @unique
+  createdAt DateTime @default(now())
 
-  uploads       uploadData[]  @relation("OwnerUploads")
+  uploads      uploadData[] @relation("OwnerUploads")
+  sharedPhotos PhotoShare[] @relation("SharedBy") // ✅ Added
 }
 
 model uploadData {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   photo       String
   description String
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
 
-  userId      Int
-  user        User      @relation("OwnerUploads", fields: [userId], references: [id])
+  userId Int
+  user   User @relation("OwnerUploads", fields: [userId], references: [id])
 
-  sharedWith  Int[]     @default([]) // ✅ Important!
+  shares PhotoShare[] // 🔁 Sharing relation
 }
 
+model PhotoShare {
+  id      Int        @id @default(autoincrement())
+  photo   uploadData @relation(fields: [photoId], references: [id])
+  photoId Int
+
+  sharedBy   User @relation("SharedBy", fields: [sharedById], references: [id])
+  sharedById Int
+
+  sharedWith String
+  sharedAt   DateTime @default(now())
+}

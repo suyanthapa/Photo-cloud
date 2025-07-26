@@ -21,13 +21,13 @@ const sharePhoto = async (req: IRequest, res: Response): Promise<void> => {
       res.status(400).json({ error: "Cannot share photo with yourself" });
       return;
     }
-
+    
     const photo = await client.uploadData.findUnique({
       where: { id: photoId },
       select: {
         id: true,
-        userId: true,
-        sharedWith: true,
+        userId: true
+       
       },
     });
 
@@ -36,17 +36,27 @@ const sharePhoto = async (req: IRequest, res: Response): Promise<void> => {
       return;
     }
 
-    if (photo.sharedWith.includes(receiverUser.id)) {
-      res.status(400).json({ error: "Photo already shared with this user" });
+    const alreadyShared = await client.photoShare.findFirst({
+      where: 
+        {  
+          photoId,
+          sharedWith: receiverEmail,
+
+         },
+    });
+
+    if(alreadyShared){
+        res.status(400).json({ error: "Photo already shared with this email" });
       return;
     }
 
-    await client.uploadData.update({
-      where: { id: photoId },
+    
+       // Save share record
+    await client.photoShare.create({
       data: {
-        sharedWith: {
-          push: receiverUser.id,
-        },
+        photoId,
+        sharedById: Number(userId),
+        sharedWith: receiverEmail,
       },
     });
 
@@ -64,58 +74,40 @@ const viewSharedPhotos = async (req: IRequest, res: Response): Promise<void> => 
   try {
     const loggedInUserId = Number(req.userId);
 
-    const myPhotos = await client.uploadData.findMany({
+    //Find all PhotoShare records where the current user shared the photo
+    const shares = await client.photoShare.findMany({
       where: {
-        userId: loggedInUserId,
-        sharedWith: {
-          isEmpty: false, // Only show photos that are shared
-        },
+        sharedById: loggedInUserId,
       },
-      select: {
-        id: true,
-        photo: true,
-        description: true,
-        sharedWith: true,
+      include :{ //Include related photo data for each shared entry
+        photo: {
+          select :{
+            id: true,
+            photo: true,
+            description : true
+          },
+        },
       },
     });
 
-    // Get all user IDs from sharedWith arrays
-    const allUserIds = [...new Set(myPhotos.flatMap(photo => photo.sharedWith))];
+    //format the result for frontend display
+    const formatted = shares.map(share => ({
 
-    const users = await client.user.findMany({
-      where: {
-        id: { in: allUserIds },
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-      },
-    });
+      sharedAt: share.sharedAt,
+      sharedWith: share.sharedWith,
+      photo: {
+        id: share.photo.id,
+        photo: share.photo.photo,
+        discription: share.photo.description
+      }
+    }))
+   
 
-    // Create a map with full user info
-    const userMap = Object.fromEntries(
-      users.map(user => [user.id, { username: user.username, email: user.email }])
-    );
-
-    const formatted = myPhotos.flatMap(photo => 
-      photo.sharedWith.map(userId => ({
-        uploadData: {
-          id: photo.id,
-          photo: photo.photo,
-          description: photo.description,
-        },
-        user: {
-          id: userId,
-          username: userMap[userId]?.username || "Unknown",
-          email: userMap[userId]?.email || "N/A",
-        },
-      }))
-    );
 
     res.status(200).json({
-      message: "Your shared photos",
-      data: formatted,
+        message: "Your shared photos",
+        data: formatted,
+     
     });
   } catch (e: unknown) {
     console.error("ViewSharedPhotos error:", e);
@@ -131,30 +123,55 @@ const sharedToMe = async (req: IRequest, res: Response): Promise<void> => {
   try {
     const loggedInUserId = Number(req.userId);
 
-    const sharedPhotos = await client.uploadData.findMany({
-      where: {
-        sharedWith: {
-          has: loggedInUserId,
-        },
+     // Step 1: Get current user's email
+    const currentUser = await client.user.findUnique({
+      where: { id: loggedInUserId },
+    });
+
+    if (!currentUser) {
+      res.status(400).json({ error: "User not found" });
+      return;
+    }
+
+    const sharedPhotos = await client.photoShare.findMany({
+      where : 
+      {
+        sharedWith : currentUser.email
       },
-      select: {
-        id: true,
-        photo: true,
-        description: true,
-        createdAt: true,
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true
+      include: {
+        photo : {
+          select : {
+            id : true,
+            description: true,
+            photo: true,
+            createdAt: true,
+            user : {
+              select : {
+                 id: true,
+                  username: true,
+                  email : true
+              },
+            },
           },
         },
       },
-    });
+    })
 
+
+    const formatted = sharedPhotos.map((entry) => ({
+      sharedAt : entry.sharedAt,
+      sharedBy: entry.photo.user,
+      photo: {
+        id: entry.photo.id,
+         photo: entry.photo.photo,
+        description: entry.photo.description,
+        createdAt: entry.photo.createdAt,
+      }
+    
+    }))
     res.status(200).json({
       message: "Photos shared with you",
-      data: sharedPhotos,
+      data: formatted,
     });
   } catch (e: unknown) {
     console.error("SharedToMe error:", e);
