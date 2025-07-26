@@ -113,7 +113,7 @@ const viewSingleData = async (req: IRequest, res: Response):Promise <void> => {
           id: Number(userId)
          },
       }); 
-
+      
       if(!existingUser){
          res.status(400).json({ error: "User doesnot exist" });
         return;

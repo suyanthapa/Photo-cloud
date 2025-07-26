@@ -159,8 +159,8 @@ catch (err: any) {
 
            <div className="flex w-full grow bg-white py-3 justify-center">
             <img
-              src={`http://localhost:8000/uploads/${photoData.photo}`}
-              alt="Uploaded"
+              src={photoData.photo}
+              alt={photoData.description}
               className="max-w-[500px] w-full max-h-[400px] rounded-md object-contain"
             />
           </div>
