@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import upload from "../Middleware/multerConfig";
 import IRequest from '../Middleware/IRequest';
 import { promises } from "dns";
+import { cloudinary } from "../utils/cloudinary";
+import { extractPublicIdFromUrl } from "../utils/cloudinaryHelper";
 
 const client = new PrismaClient()
 
@@ -113,7 +115,7 @@ const viewSingleData = async (req: IRequest, res: Response):Promise <void> => {
           id: Number(userId)
          },
       }); 
-      
+
       if(!existingUser){
          res.status(400).json({ error: "User doesnot exist" });
         return;
@@ -245,6 +247,15 @@ const viewSingleData = async (req: IRequest, res: Response):Promise <void> => {
       return;
     }
 
+     //  Extract public_id from the photo URL
+    const photoUrl = verifyUser.photo;
+    const publicId = extractPublicIdFromUrl(photoUrl);
+
+    //Delete from cloudinary
+    if(publicId){
+      await cloudinary.uploader.destroy(publicId)
+    }
+
     const deleted = await client.uploadData.delete({
       where: {
         id: uploadedId,
@@ -252,7 +263,7 @@ const viewSingleData = async (req: IRequest, res: Response):Promise <void> => {
     });
 
     res.status(200).json({
-      message: "Deleted Successfully",
+      message: "Deleted Successfully from Cloudinary and database",
       documentId: uploadedId,
     });
   } catch (e: unknown) {
