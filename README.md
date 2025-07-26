@@ -62,10 +62,10 @@ cd Photo-cloud
 
 ### 2. Backend Setup
 
-- Navigate to the backend folder:
+- Navigate to the server folder:
 
 ```bash
-cd backend
+cd server
 ```
 
 
@@ -81,7 +81,7 @@ npm install
 npm run dev
 ```
 
-> The backend API is deployed on Render at `https://your-backend-render-url`, so for production the frontend should use this URL.
+> The backend API is deployed on Render at `https://photo-cloud-2.onrender.com`, so for production the frontend should use this URL.
 
 ---
 
@@ -93,11 +93,7 @@ npm run dev
 cd ../frontend
 ```
 
-- Create a `.env` file with:
 
-```env
-VITE_API_URL=https://your-backend-render-url/api/data
-```
 
 - Install dependencies:
 
@@ -122,7 +118,7 @@ npm run dev
 
 ### Live Demo
 
-Check out the live app at: [https://photo-cloud-zeta.vercel.app/live](https://photo-cloud-zeta.vercel.app/)
+Check out the live app at: https://photo-cloud-delta.vercel.app/)
 
 ---
 
