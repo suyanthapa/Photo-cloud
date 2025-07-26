@@ -118,14 +118,14 @@ const InsideImage: React.FC = () => {
   const handleShareData = async () => {
      try{
       console.log("Payload", {
-  receiverEmail: sharedGmail,
-  photoId: photoData.id
+      receiverEmail: sharedGmail,
+      photoId: photoData.id
 });
 
 console.log("type",typeof sharedGmail); // should log: number
 
       const res = await axios.post(
-            "http://localhost:8000/api/data/share/sharePhoto",
+            `${apiBaseUrl}/api/data/share/sharePhoto`,
          {
           receiverEmail: sharedGmail,
           photoId: (photoData.id) 

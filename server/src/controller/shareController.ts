@@ -11,7 +11,7 @@ const sharePhoto = async (req: IRequest, res: Response): Promise<void> => {
     const receiverUser = await client.user.findUnique({
       where: { email: receiverEmail },
     });
-
+    
     if (!receiverUser) {
       res.status(400).json({ error: "User does not exist" });
       return;
