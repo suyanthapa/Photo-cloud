@@ -107,7 +107,7 @@ const ViewSharedPhoto: React.FC = () => {
           <div className="flex w-full max-w-[700px] flex-col mx-auto">
             <div className="flex w-full grow bg-white py-3 justify-center">
               <img
-                src={`http://localhost:8000/uploads/${photoData.photo}`}
+                src={photoData.photo}
                 alt="Uploaded"
                 className="max-w-[500px] w-full max-h-[400px] rounded-md object-contain"
               />

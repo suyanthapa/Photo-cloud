@@ -68,7 +68,7 @@ const SharedWithMe: React.FC = () => {
                   className="bg-white rounded-lg shadow-md relative"
                   >
                   <img
-                    src={`${apiBaseUrl}/uploads/${received.photo}`}
+                    src={received.photo}
                     alt={received.description || "Uploaded photo"}
                     className="w-full h-48 object-cover"
                     onClick={()=> handleInsideImage(received.id)}
