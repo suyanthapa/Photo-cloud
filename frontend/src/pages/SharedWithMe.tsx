@@ -5,16 +5,18 @@ import ThreeDotMenu from "../components/ThreeDotMenu";
 import { useNavigate } from "react-router-dom";
 
 interface ReceivedData {
-  photo: {
-     id: number,
-  description: string,
-  photo: string,
-  createdAt: string
+  sharedAt: string,
+  sharedBy: {
+     id: number;
+    username: string;
+    email: string;
   }
- 
- user : {
-     email : string
- }
+  photo: {
+     id: number;
+    description: string;
+    photo: string;
+    createdAt: string;
+  }
 }
 
 const SharedWithMe: React.FC = () => {
@@ -86,7 +88,7 @@ const SharedWithMe: React.FC = () => {
                           {formatDate(received.photo.createdAt)}
                         </p>
                         <p className="text-sm text-gray-500">
-                         Shared By :  {received.user.email}
+                         Shared By :  {received.sharedBy.email}
                         </p>
                       </div>
                       {/* Just render the ThreeDotMenu component */}
