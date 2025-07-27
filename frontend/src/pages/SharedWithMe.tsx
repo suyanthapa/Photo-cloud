@@ -5,10 +5,13 @@ import ThreeDotMenu from "../components/ThreeDotMenu";
 import { useNavigate } from "react-router-dom";
 
 interface ReceivedData {
-  id: number;
-  description: string;
-  photo: string;
-  createdAt: string;
+  photo: {
+     id: number,
+  description: string,
+  photo: string,
+  createdAt: string
+  }
+ 
  user : {
      email : string
  }
@@ -64,30 +67,30 @@ const SharedWithMe: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {received.map((received) => (
                 <div
-                  key={received.id}
+                  key={received.photo.id}
                   className="bg-white rounded-lg shadow-md relative"
                   >
                   <img
-                    src={received.photo}
-                    alt={received.description || "Uploaded photo"}
+                    src={received.photo.photo}
+                    alt={received.photo.description || "Uploaded photo"}
                     className="w-full h-48 object-cover"
-                    onClick={()=> handleInsideImage(received.id)}
+                    onClick={()=> handleInsideImage(received.photo.id)}
                   />
                   <div className="p-4">
                     <div className="flex justify-between items-center">
                       <div  >
                         <p className="text-gray-700 mb-1">
-                          {received.description || "No description"}
+                          {received.photo.description || "No description"}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {formatDate(received.createdAt)}
+                          {formatDate(received.photo.createdAt)}
                         </p>
                         <p className="text-sm text-gray-500">
                          Shared By :  {received.user.email}
                         </p>
                       </div>
                       {/* Just render the ThreeDotMenu component */}
-                      <ThreeDotMenu uploadedId={received.id} />
+                      <ThreeDotMenu uploadedId={received.photo.id} />
 
                     </div>
                   </div>

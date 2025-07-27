@@ -164,10 +164,9 @@ const sharedToMe = async (req: IRequest, res: Response): Promise<void> => {
       photo: {
         id: entry.photo.id,
          photo: entry.photo.photo,
-        description: entry.photo.description,
+        description: entry.photo.description,   
         createdAt: entry.photo.createdAt,
       }
-    
     }))
     res.status(200).json({
       message: "Photos shared with you",

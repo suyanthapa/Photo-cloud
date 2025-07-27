@@ -13,4 +13,5 @@ sharedRouter.get('/viewSharedPhotos', getUserfromAuthToken,shareController.viewS
 
 
 sharedRouter.get('/sharedPhotos', getUserfromAuthToken,shareController.sharedToMe);
+
 export default sharedRouter;
