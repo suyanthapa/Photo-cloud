@@ -44,6 +44,8 @@ A full-stack photo sharing web application that allows users to securely registe
 - JWT & Cookie-based Authentication
 - Multer for handling file uploads
 - Cloudinary SDK for image storage
+- Bcrypt
+- Email verification with OTP  during user registration.
 
 ### Database
 
