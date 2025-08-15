@@ -8,14 +8,16 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  password  String
-  email     String   @unique
-  createdAt DateTime @default(now())
+  id              Int      @id @default(autoincrement())
+  username        String   @unique
+  password        String
+  email           String   @unique
+  createdAt       DateTime @default(now())
+  isEmailVerified Boolean  @default(false)
 
-  uploads      uploadData[] @relation("OwnerUploads")
-  sharedPhotos PhotoShare[] @relation("SharedBy") // ✅ Added
+  uploads           uploadData[]        @relation("OwnerUploads")
+  sharedPhotos      PhotoShare[]        @relation("SharedBy") // ✅ Added
+  EmailVerification EmailVerification[]
 }
 
 model uploadData {
@@ -40,4 +42,16 @@ model PhotoShare {
 
   sharedWith String
   sharedAt   DateTime @default(now())
+}
+
+model EmailVerification {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  otp       String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  used      Boolean  @default(false)
+
+  user   User? @relation(fields: [userId], references: [id])
+  userId Int?
 }

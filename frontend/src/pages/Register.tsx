@@ -1,87 +1,184 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    username: '',
-    password: ''
+    email: "",
+    username: "",
+    password: "",
   });
-  const [message, setMessage] = useState('');
-   const apiBaseUrl = import.meta.env.VITE_API_URL;
+  const [otp, setOtp] = useState("");
+  const [message, setMessage] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     try {
-      const res = await axios.post(`${apiBaseUrl}/api/auth/register`, formData);
-      setMessage('Registration successful!');
-      console.log(res.data);
+      await axios.post(`${apiBaseUrl}/api/auth/send-register-otp`, {
+        email: formData.email,
+        username: formData.email,
+        password: formData.password,
+      });
+      setMessage("✅ OTP sent! Please check your email.");
+      setOtpSent(true);
     } catch (err: any) {
       setMessage(
         err.response?.data?.message ||
-        err.response?.data?.error ||
-        'Registration failed.'
+          err.response?.data?.error ||
+          " Failed to send OTP."
+      );
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(
+        `${apiBaseUrl}/api/auth/verify-register-otp`,
+        {
+          email: formData.email,
+          username: formData.username,
+          password: formData.password,
+          OTP: otp,
+        }
+      );
+      setMessage("Registration completed successfully!");
+      console.log(res.data);
+      setOtpSent(false);
+      setFormData({ email: "", username: "", password: "" });
+      setOtp("");
+    } catch (err: any) {
+      setMessage(
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "OTP verification failed."
       );
     }
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-sm bg-white p-8 rounded shadow">
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
-        {message && <p className="mb-4 text-sm text-center text-blue-600">{message}</p>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block mb-1 text-sm font-medium">Email</label>
-            <input
-              type="email"
-              className="w-full px-3 py-2 border rounded"
-              placeholder="john@example.com"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-1 text-sm font-medium">Username</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border rounded"
-              placeholder="yourusername"
-              value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label className="block mb-1 text-sm font-medium">Password</label>
-            <input
-              type="password"
-              className="w-full px-3 py-2 border rounded"
-            
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
-          >
-            Register
-          </button>
-        </form>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 to-green-100 px-4">
+      <Card className="w-full max-w-md rounded-2xl shadow-xl border border-gray-200 bg-white backdrop-blur-sm">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-gray-800">
+            Create an Account
+          </CardTitle>
+          <CardDescription className="mt-1 text-gray-500">
+            Fill in the details to join us
+          </CardDescription>
+          {message && (
+            <p
+              className={`mt-3 text-sm font-medium ${
+                message.includes("✅") ? "text-green-600" : "text-red-500"
+              }`}
+            >
+              {message}
+            </p>
+          )}
+        </CardHeader>
 
-        {/* Login Redirect */}
-        <p className="mt-4 text-sm text-center text-gray-600">
-          Already have an account?{' '}
-          <Link to="/" className="text-blue-600 hover:underline">
-            Login
-          </Link>
-        </p>
-      </div>
+        <CardContent>
+          <form
+            onSubmit={otpSent ? handleVerifyOtp : handleSendOtp}
+            className="space-y-5"
+          >
+            <div>
+              <label className="block mb-1 text-sm font-semibold text-gray-700">
+                Email
+              </label>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all outline-none"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                required
+              />
+            </div>
+
+            {otpSent && (
+              <div>
+                <label className="block mb-1 text-sm font-semibold text-gray-700">
+                  OTP
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter OTP"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all outline-none"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+
+            {!otpSent && (
+              <>
+                <div>
+                  <label className="block mb-1 text-sm font-semibold text-gray-700">
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="yourusername"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all outline-none"
+                    value={formData.username}
+                    onChange={(e) =>
+                      setFormData({ ...formData, username: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-1 text-sm font-semibold text-gray-700">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all outline-none"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+              </>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+            >
+              {otpSent ? "Verify OTP" : "Register"}
+            </Button>
+          </form>
+        </CardContent>
+
+        <CardFooter className="flex flex-col items-center gap-2 text-sm text-gray-600">
+          <p>
+            Already have an account?{" "}
+            <Link to="/" className="text-green-600 font-medium hover:underline">
+              Login
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

@@ -20,7 +20,7 @@ server.use(
   express.static(path.join(__dirname, "../public/assets/documents/photo"))
 );
 
-// server.use(cors({ origin: "http://localhost:4173", credentials: true }));
+// server.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());

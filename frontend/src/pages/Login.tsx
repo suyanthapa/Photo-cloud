@@ -12,61 +12,60 @@ import {
 } from "../components/ui/card";
 
 const Login: React.FC = () => {
-  console.log("API URL:", import.meta.env.VITE_API_URL);
-
   const apiBaseUrl = import.meta.env.VITE_API_URL;
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       const res = await axios.post(`${apiBaseUrl}/api/auth/login`, formData, {
         withCredentials: true,
       });
-      setMessage("Login Successfully");
+      setMessage("✅ Login Successfully");
       console.log(res.data);
-
       navigate("/dashboard");
     } catch (err: any) {
       setMessage(
         err.response?.data?.message ||
           err.response?.data?.error ||
-          "Login Failed"
+          "❌ Login Failed"
       );
     }
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-100">
-      <Card className="w-full max-w-sm bg-white p-8 rounded shadow">
-        <CardHeader>
-          <CardTitle>Login</CardTitle>
-          <CardDescription>
-            {message && (
-              <p className="mb-4 text-sm text-center text-blue-600">
-                {message}
-              </p>
-            )}
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 px-4">
+      <Card className="w-full max-w-md rounded-2xl shadow-xl border border-gray-200 bg-white backdrop-blur-sm">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-gray-800">
+            Welcome Back
+          </CardTitle>
+          <CardDescription className="mt-1 text-gray-500">
+            Please sign in to continue
           </CardDescription>
+          {message && (
+            <p
+              className={`mt-3 text-sm font-medium ${
+                message.includes("✅") ? "text-green-600" : "text-red-500"
+              }`}
+            >
+              {message}
+            </p>
+          )}
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block mb-1 text-sm font-medium">
-                Emailllllllllllllllll
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block mb-1 text-sm font-semibold text-gray-700">
+                Email
               </label>
               <input
                 type="email"
-                className="w-full px-3 py-2 border rounded"
                 placeholder="you@example.com"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all outline-none"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -74,13 +73,15 @@ const Login: React.FC = () => {
                 required
               />
             </div>
-            <div className="mb-6">
-              <label className="block mb-1 text-sm font-medium">
-                Password :Y
+
+            <div>
+              <label className="block mb-1 text-sm font-semibold text-gray-700">
+                Password
               </label>
               <input
                 type="password"
-                className="w-full px-3 py-2 border rounded"
+                placeholder="••••••••"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all outline-none"
                 value={formData.password}
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
@@ -88,23 +89,33 @@ const Login: React.FC = () => {
                 required
               />
             </div>
+
             <Button
               variant="default"
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+              className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
             >
               Login
             </Button>
           </form>
         </CardContent>
 
-        <CardFooter>
-          <p className="mt-4 text-sm text-center text-gray-600">
-            Does not have an account?{" "}
-            <Link to="/register" className="text-blue-600 hover:underline">
+        <CardFooter className="flex flex-col items-center gap-2 text-sm text-gray-600">
+          <p>
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-blue-600 font-medium hover:underline"
+            >
               Register
             </Link>
           </p>
+          <Link
+            to="/forgot-password"
+            className="text-blue-500 hover:underline text-xs"
+          >
+            Forgot your password?
+          </Link>
         </CardFooter>
       </Card>
     </div>
