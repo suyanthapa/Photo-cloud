@@ -9,12 +9,14 @@ import SharedPhotosPage from "./pages/SharedByYou";
 
 import SharedWithMe from "./pages/SharedWithMe";
 import ViewSharedPhoto from "./components/ViewSharedPhoto";
+import ForgotPassword from "./pages/ForgotPasword";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/upload" element={<UploadPage />} />
