@@ -34,8 +34,23 @@ async function sendEmail(
   return info;
 }
 
-// 📩 Specific email sending function
+// 📩 Specific email sending function for verify email while registering
 export const verifyUserEmail = async (userEmail: string) => {
+  const token = generateToken(); // generate here only once
+  const subject = "Password Recovery - Verify Your Email";
+  const text = `Hello, use the token to verify your email: ${token}`;
+  const html = `<p>Dear User,</p>
+    <p>Please use the following token to verify your email address:</p>
+    <p><b style="font-size: 20px;">${token}</b></p>
+    <p>Do not share this token with anyone.</p>
+    <p>Thank you,<br />The photoCloud Team</p>`;
+
+  const info = await sendEmail(userEmail, subject, html, text);
+  console.log("token by function", token);
+  return { token, info }; // return the SAME token
+};
+
+export const forgotPasswordEmail = async (userEmail: string) => {
   const token = generateToken(); // generate here only once
   const subject = "Password Recovery - Verify Your Email";
   const text = `Hello, use the token to verify your email: ${token}`;

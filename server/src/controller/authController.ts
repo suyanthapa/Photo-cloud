@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { error } from "console";
-import { verifyUserEmail } from "../services/mailer";
+import { verifyUserEmail, forgotPasswordEmail } from "../services/mailer";
 import { findUserByEmail } from "../utils/userHelper";
 const client = new PrismaClient();
 dotenv.config(); // Load .env varia
@@ -104,7 +104,7 @@ const verifyRegisterOtp = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { email, username, password, OTP } = req.body;
+    const { email, OTP } = req.body;
 
     //  Get OTP record from EmailVerification table
     const otpDoc = await client.emailVerification.findFirst({
@@ -129,17 +129,6 @@ const verifyRegisterOtp = async (
       return;
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
-
-    // 3️⃣ Create new user
-    const user = await client.user.create({
-      data: {
-        email,
-        username,
-        password: hashedPassword,
-      },
-    });
     //  Mark OTP as used
     await client.emailVerification.update({
       where: { id: otpDoc.id },
@@ -148,20 +137,8 @@ const verifyRegisterOtp = async (
       },
     });
 
-    // 7️⃣ Generate token
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        email: user.email,
-      },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "7d" }
-    );
-
     res.status(200).json({
       message: "OTP verified successfully",
-      user: { ...user, isEmailVerified: true },
-      token,
     });
     return;
   } catch (error) {
@@ -170,6 +147,9 @@ const verifyRegisterOtp = async (
     return;
   }
 };
+
+//for forgot password otp verification
+const verifyForgotPasswordOtp = verifyRegisterOtp;
 
 // Send OTP for user registration
 const sendRegisterOtp = async (req: Request, res: Response): Promise<void> => {
@@ -233,11 +213,114 @@ const sendRegisterOtp = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email } = req.body;
+
+    const user = await findUserByEmail(email);
+    if (!user) {
+      res.status(400).json({ error: "User doesnot exist" });
+      return;
+    }
+
+    // check if OTP already exists for this email & delete it
+    const existingOTP = await client.emailVerification.findFirst({
+      where: { email, used: false },
+    });
+
+    if (existingOTP) {
+      await client.emailVerification.deleteMany({
+        where: { email },
+      });
+    }
+    // Call the function to send the verify email
+    const { token, info } = await forgotPasswordEmail(email);
+
+    const expiryOTP = new Date(Date.now() + 10 * 60 * 1000); // valid for 10 minutes
+
+    await client.emailVerification.create({
+      data: {
+        email,
+        otp: token, // plain
+        expiresAt: expiryOTP,
+        used: false,
+        userId: null,
+      },
+    });
+
+    const otpDoc = await client.emailVerification.findFirst({
+      where: { email, used: false },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.status(200).json({
+      details: [
+        {
+          message: "Otp Sent Successfully",
+          user,
+        },
+      ],
+    });
+    return;
+  } catch (e: unknown) {
+    console.error("Send OTP error:", e);
+    if (e instanceof Error) {
+      res.status(500).json({ message: e.message });
+      return;
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+      return;
+    }
+  }
+};
+
+// Reset Password ( changepassword )
+const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, password, confirmPassword } = req.body;
+
+    const existingUser = await findUserByEmail(email);
+    if (!existingUser) {
+      res.status(400).json({ error: "User doesnot exist" });
+      return;
+    }
+
+    if (password != confirmPassword) {
+      res.status(401).json({ message: "Password don't match" });
+      return;
+    }
+
+    //  Hash password
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
+
+    await client.user.update({
+      where: { id: existingUser.id },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    res.status(201).json({
+      message: "User Logged In ",
+    });
+  } catch (e: unknown) {
+    console.error("Login error:", e);
+    if (e instanceof Error) {
+      res.status(500).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
+  }
+};
+
 const authController = {
   register,
   login,
   verifyRegisterOtp,
   sendRegisterOtp,
+  forgotPassword,
+  verifyForgotPasswordOtp,
+  resetPassword,
 };
 
 export default authController;

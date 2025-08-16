@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -10,11 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
+import forgotPasswordIcon from "../assets/forgot-password.jpg";
 
 const ForgotPassword: React.FC = () => {
   const apiBaseUrl = import.meta.env.VITE_API_URL;
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,13 +24,14 @@ const ForgotPassword: React.FC = () => {
       const res = await axios.post(`${apiBaseUrl}/api/auth/forgot-password`, {
         email,
       });
-      setMessage("✅ Password reset link sent to your email");
+      setMessage(" Password reset link sent to your email");
       console.log(res.data);
+      navigate("/check-email", { state: { email } });
     } catch (err: any) {
       setMessage(
         err.response?.data?.message ||
           err.response?.data?.error ||
-          "❌ Failed to send reset link"
+          " Failed to send reset link"
       );
     }
   };
@@ -37,6 +40,13 @@ const ForgotPassword: React.FC = () => {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 px-4">
       <Card className="w-full max-w-md rounded-2xl shadow-xl border border-gray-200 bg-white backdrop-blur-sm">
         <CardHeader className="text-center">
+          <div className="flex justify-center mb-7">
+            <img
+              src={forgotPasswordIcon}
+              alt="Check Email"
+              className="w-40 h-50"
+            />
+          </div>
           <CardTitle className="text-2xl font-bold text-gray-800">
             Forgot your password?
           </CardTitle>
