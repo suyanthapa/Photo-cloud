@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
+import Navbar from "../../components/Navbar";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -29,7 +29,7 @@ const SharedPhotosPage = () => {
   const [sharedPhotos, setSharedPhotos] = useState<GroupedSharedPhoto[]>([]);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-   const apiBaseUrl = import.meta.env.VITE_API_URL;
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   const fetchSharedData = async () => {
     try {

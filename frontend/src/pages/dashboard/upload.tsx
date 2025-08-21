@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Navbar from "../components/Navbar";
+import Navbar from "../../components/Navbar";
 
 interface UploadedData {
   id: string;
@@ -17,12 +17,12 @@ const UploadPage: React.FC = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
   const apiBaseUrl = import.meta.env.VITE_API_URL;
-  
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
       setFile(selectedFile);
-      
+
       // Create preview URL
       const reader = new FileReader();
       reader.onload = () => {
@@ -38,7 +38,7 @@ const UploadPage: React.FC = () => {
     if (droppedFiles.length > 0) {
       const selectedFile = droppedFiles[0];
       setFile(selectedFile);
-      
+
       // Create preview URL
       const reader = new FileReader();
       reader.onload = () => {
@@ -54,39 +54,41 @@ const UploadPage: React.FC = () => {
 
   const handleUpload = async () => {
     if (!file) {
-      alert('Please select a file');
+      alert("Please select a file");
       return;
     }
     if (!description.trim()) {
-      alert('Please enter description');
+      alert("Please enter description");
       return;
     }
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append('photo', file);
-    formData.append('description', description);
+    formData.append("photo", file);
+    formData.append("description", description);
 
     try {
       const res = await axios.post(`${apiBaseUrl}/api/data/upload`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
-        withCredentials: true, 
+        withCredentials: true,
       });
-      console.log(res.data)
-      alert('Upload successful');
-      
+      console.log(res.data);
+      alert("Upload successful");
+
       // Reset form
-      setDescription('');
+      setDescription("");
       setFile(null);
       setPreviewUrl(null);
-      
+
       // Fetch updated uploads
       fetchUploads();
     } catch (error: any) {
-      console.error('Upload failed:', error.response ?? error.message);
-      alert('Upload failed: ' + (error.response?.data?.message || error.message));
+      console.error("Upload failed:", error.response ?? error.message);
+      alert(
+        "Upload failed: " + (error.response?.data?.message || error.message)
+      );
     } finally {
       setIsUploading(false);
     }
@@ -94,12 +96,15 @@ const UploadPage: React.FC = () => {
 
   const fetchUploads = async () => {
     try {
-      const res = await axios.get<{ data: UploadedData[] }>(`${apiBaseUrl}/api/data/viewData`, {
-        withCredentials: true,
-      });
+      const res = await axios.get<{ data: UploadedData[] }>(
+        `${apiBaseUrl}/api/data/viewData`,
+        {
+          withCredentials: true,
+        }
+      );
       setUploads(res.data.data);
     } catch (error) {
-      console.error('Failed to fetch uploads', error);
+      console.error("Failed to fetch uploads", error);
     }
   };
 
@@ -109,21 +114,20 @@ const UploadPage: React.FC = () => {
 
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
-    const options: Intl.DateTimeFormatOptions = { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     };
-    return date.toLocaleDateString('en-US', options);
+    return date.toLocaleDateString("en-US", options);
   };
 
   return (
     <div className="layout-container flex h-full grow flex-col">
       <Navbar />
-      
+
       <div className="p-10 max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-9">Upload a Photo</h1>
-
         {/* Upload Area */}
         <div
           className="bg-gray-100 rounded-xl h-80 flex flex-col items-center justify-center text-center p-6 mb-6 border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors"
@@ -149,7 +153,9 @@ const UploadPage: React.FC = () => {
             </div>
           ) : (
             <>
-              <p className="text-xl font-bold mb-4">Drag and drop your photo here</p>
+              <p className="text-xl font-bold mb-4">
+                Drag and drop your photo here
+              </p>
               <div className="flex items-center gap-2">
                 <input
                   type="file"
@@ -162,13 +168,14 @@ const UploadPage: React.FC = () => {
                   htmlFor="fileInput"
                   className="flex items-center border px-4 py-2 rounded-lg cursor-pointer bg-white hover:bg-gray-50 transition-colors"
                 >
-                  <span className="text-gray-600">Or select a file from your computer</span>
+                  <span className="text-gray-600">
+                    Or select a file from your computer
+                  </span>
                 </label>
               </div>
             </>
           )}
         </div>
-
         {/* Description Input */}
         <textarea
           placeholder="Add a description"
@@ -177,33 +184,35 @@ const UploadPage: React.FC = () => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-
         {/* Upload Button */}
         <button
           onClick={handleUpload}
           disabled={isUploading || !file || !description.trim()}
           className="bg-blue-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
         >
-          {isUploading ? 'Uploading...' : 'Upload'}
+          {isUploading ? "Uploading..." : "Upload"}
         </button>
-
         Uploaded Photos Display
         {uploads.length > 0 && (
           <div className="mt-12">
             <h2 className="text-xl font-bold mb-6">Your Uploaded Photos</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {uploads.map((upload) => (
-                <div key={upload.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                  
-                 <img
-                  src={upload.photo}
-                  alt={upload.description}
-                  className="w-full h-48 object-cover"
-                />
+                <div
+                  key={upload.id}
+                  className="bg-white rounded-lg shadow-md overflow-hidden"
+                >
+                  <img
+                    src={upload.photo}
+                    alt={upload.description}
+                    className="w-full h-48 object-cover"
+                  />
 
                   <div className="p-4">
                     <p className="text-gray-700 mb-2">{upload.description}</p>
-                    <p className="text-sm text-gray-500">{formatDate(upload.createdAt)}</p>
+                    <p className="text-sm text-gray-500">
+                      {formatDate(upload.createdAt)}
+                    </p>
                   </div>
                 </div>
               ))}

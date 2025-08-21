@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Navbar from "../components/Navbar";
-import ThreeDotMenu from "../components/ThreeDotMenu";
+import Navbar from "../../components/Navbar";
+import ThreeDotMenu from "../../components/ThreeDotMenu";
 import { useNavigate } from "react-router-dom";
 
 interface ReceivedData {
-  sharedAt: string,
+  sharedAt: string;
   sharedBy: {
-     id: number;
+    id: number;
     username: string;
     email: string;
-  }
+  };
   photo: {
-     id: number;
+    id: number;
     description: string;
     photo: string;
     createdAt: string;
-  }
+  };
 }
 
 const SharedWithMe: React.FC = () => {
   const [received, setReceived] = useState<ReceivedData[]>([]);
   const navigate = useNavigate();
-   const apiBaseUrl = import.meta.env.VITE_API_URL;
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   const fetchUploads = async () => {
     try {
@@ -53,8 +53,8 @@ const SharedWithMe: React.FC = () => {
   };
 
   const handleInsideImage = async (id: number) => {
-    navigate(`photo/${id}`)
-  }
+    navigate(`photo/${id}`);
+  };
 
   return (
     <div className="layout-container flex h-full grow flex-col">
@@ -71,16 +71,16 @@ const SharedWithMe: React.FC = () => {
                 <div
                   key={received.photo.id}
                   className="bg-white rounded-lg shadow-md relative"
-                  >
+                >
                   <img
                     src={received.photo.photo}
                     alt={received.photo.description || "Uploaded photo"}
                     className="w-full h-48 object-cover"
-                    onClick={()=> handleInsideImage(received.photo.id)}
+                    onClick={() => handleInsideImage(received.photo.id)}
                   />
                   <div className="p-4">
                     <div className="flex justify-between items-center">
-                      <div  >
+                      <div>
                         <p className="text-gray-700 mb-1">
                           {received.photo.description || "No description"}
                         </p>
@@ -88,12 +88,11 @@ const SharedWithMe: React.FC = () => {
                           {formatDate(received.photo.createdAt)}
                         </p>
                         <p className="text-sm text-gray-500">
-                         Shared By :  {received.sharedBy.email}
+                          Shared By : {received.sharedBy.email}
                         </p>
                       </div>
                       {/* Just render the ThreeDotMenu component */}
                       <ThreeDotMenu uploadedId={received.photo.id} />
-
                     </div>
                   </div>
                 </div>

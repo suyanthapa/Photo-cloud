@@ -1,19 +1,19 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import UploadPage from "./pages/upload";
-import AllPhotos from "./pages/AllPhotos";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import Dashboard from "./pages/dashboard/Dashboard";
+import UploadPage from "./pages/dashboard/upload";
+import AllPhotos from "./pages/dashboard/AllPhotos";
 import InsideImage from "./components/InsideImage";
-import SharedPhotosPage from "./pages/SharedByYou";
+import SharedPhotosPage from "./pages/dashboard/SharedByYou";
 
-import SharedWithMe from "./pages/SharedWithMe";
+import SharedWithMe from "./pages/dashboard/SharedWithMe";
 import ViewSharedPhoto from "./components/ViewSharedPhoto";
-import ForgotPassword from "./pages/ForgotPasword";
+import ForgotPassword from "./pages/auth/ForgotPasword";
 
-import ResetPassword from "./pages/ResetPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
-import SentEmail from "./pages/EmailSent";
+import SentEmail from "./pages/auth/EmailSent";
 // import VerifyOTP from "./pages/CheckEmail";
 import OtpVerification from "./components/OtpVerification";
 

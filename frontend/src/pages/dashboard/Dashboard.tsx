@@ -1,5 +1,4 @@
-
-import Navbar from "../components/Navbar"; 
+import Navbar from "../../components/Navbar";
 
 export default function PhotoCloud() {
   return (
@@ -10,7 +9,6 @@ export default function PhotoCloud() {
       <div className="layout-container flex h-full grow flex-col">
         <Navbar />
         <p>wwwwwwwww</p>
-        
       </div>
     </div>
   );

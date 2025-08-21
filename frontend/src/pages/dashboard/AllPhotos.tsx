@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Navbar from "../components/Navbar";
-import ThreeDotMenu from "../components/ThreeDotMenu";
+import Navbar from "../../components/Navbar";
+import ThreeDotMenu from "../../components/ThreeDotMenu";
 import { useNavigate } from "react-router-dom";
 
 interface UploadedData {
@@ -14,7 +14,7 @@ interface UploadedData {
 const AllPhotos: React.FC = () => {
   const [uploads, setUploads] = useState<UploadedData[]>([]);
   const navigate = useNavigate();
-   const apiBaseUrl = import.meta.env.VITE_API_URL;
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   const fetchUploads = async () => {
     try {
@@ -45,8 +45,8 @@ const AllPhotos: React.FC = () => {
   };
 
   const handleInsideImage = async (id: number) => {
-    navigate(`photo/${id}`)
-  }
+    navigate(`photo/${id}`);
+  };
 
   return (
     <div className="layout-container flex h-full grow flex-col">
@@ -63,16 +63,16 @@ const AllPhotos: React.FC = () => {
                 <div
                   key={upload.id}
                   className="bg-white rounded-lg shadow-md relative"
-                  >
+                >
                   <img
                     src={upload.photo}
                     alt={upload.description || "Uploaded photo"}
                     className="w-full h-48 object-cover"
-                    onClick={()=> handleInsideImage(upload.id)}
+                    onClick={() => handleInsideImage(upload.id)}
                   />
                   <div className="p-4">
                     <div className="flex justify-between items-center">
-                      <div  >
+                      <div>
                         <p className="text-gray-700 mb-1">
                           {upload.description || "No description"}
                         </p>
@@ -82,7 +82,6 @@ const AllPhotos: React.FC = () => {
                       </div>
                       {/* Just render the ThreeDotMenu component */}
                       <ThreeDotMenu uploadedId={upload.id} />
-
                     </div>
                   </div>
                 </div>
