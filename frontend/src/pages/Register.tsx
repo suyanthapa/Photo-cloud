@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -20,18 +20,21 @@ const Register: React.FC = () => {
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const navigate = useNavigate();
   const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post(`${apiBaseUrl}/api/auth/send-register-otp`, {
+      await axios.post(`${apiBaseUrl}/api/auth/register`, {
         email: formData.email,
         username: formData.email,
         password: formData.password,
       });
       setMessage("✅ OTP sent! Please check your email.");
       setOtpSent(true);
+
+      navigate("/register/verify-otp", { state: { email: formData.email } });
     } catch (err: any) {
       setMessage(
         err.response?.data?.message ||
@@ -44,15 +47,12 @@ const Register: React.FC = () => {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        `${apiBaseUrl}/api/auth/verify-register-otp`,
-        {
-          email: formData.email,
-          username: formData.username,
-          password: formData.password,
-          OTP: otp,
-        }
-      );
+      const res = await axios.post(`${apiBaseUrl}/api/auth/verify-otp`, {
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+        OTP: otp,
+      });
       setMessage("Registration completed successfully!");
       console.log(res.data);
       setOtpSent(false);

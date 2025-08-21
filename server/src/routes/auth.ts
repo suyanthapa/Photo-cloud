@@ -5,15 +5,11 @@ import validate from "../Middleware/validation";
 
 const authRouter = express.Router();
 
-// Step 1: send OTP to email
-authRouter.post(
-  "/send-register-otp",
-  validate(userValidation.register),
-  authController.sendRegisterOtp
-);
+//Login User
+authRouter.post("/login", validate(userValidation.login), authController.login);
 
-// Step 2: verify OTP
-authRouter.post("/verify-register-otp", authController.verifyRegisterOtp);
+//Login User
+authRouter.post("/", validate(userValidation.login), authController.login);
 
 //register user
 authRouter.post(
@@ -22,23 +18,24 @@ authRouter.post(
   authController.register
 );
 
-//Login User
-authRouter.post("/login", validate(userValidation.login), authController.login);
+//  verify OTP
+authRouter.post(
+  "/verify-otp",
+  validate(userValidation.verifyOTP),
+  authController.verifyInputOTP
+);
 
-//Login User
-authRouter.post("/", validate(userValidation.login), authController.login);
-
-//forgot password
+//forgot password --sends otp
 authRouter.post(
   "/forgot-password",
 
   authController.forgotPassword
 );
 
+//reset password
 authRouter.post(
-  "/verify-forgot-password-otp",
-  authController.verifyForgotPasswordOtp
+  "/reset-password",
+  validate(userValidation.resetPassword),
+  authController.resetPassword
 );
-
-authRouter.post("/reset-password", authController.resetPassword);
 export default authRouter;

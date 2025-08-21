@@ -8,6 +8,7 @@ const ResetPassword: React.FC = () => {
   const apiBaseUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const location = useLocation();
+
   const email = location.state?.email;
 
   const [formData, setFormData] = useState({
@@ -104,7 +105,7 @@ const ResetPassword: React.FC = () => {
             type="submit"
             className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-semibold"
           >
-            Send Email
+            Save Changes
           </Button>
         </form>
       </div>

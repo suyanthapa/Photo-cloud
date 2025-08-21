@@ -12,7 +12,7 @@ import {
 } from "../components/ui/card";
 import EmailSentIcon from "../assets/email-sent-icon-vector.jpg";
 
-const CheckEmail: React.FC = () => {
+const VerifyOTP: React.FC = () => {
   const apiBaseUrl = import.meta.env.VITE_API_URL;
   const [formData, setFormData] = useState({
     otp: "",
@@ -26,10 +26,10 @@ const CheckEmail: React.FC = () => {
     e.preventDefault(); //prevent page reload
 
     console.log("OTP submitted:", formData.otp);
-    const res = await axios.post(
-      `${apiBaseUrl}/api/auth/verify-forgot-password-otp`,
-      { email, OTP: formData.otp }
-    );
+    const res = await axios.post(`${apiBaseUrl}/api/auth/verify-otp`, {
+      email,
+      otp: formData.otp,
+    });
     setMessage(" OTP Validated Successfully");
     console.log(res.data);
     navigate("/reset-password", { state: { email } });
@@ -122,4 +122,4 @@ const CheckEmail: React.FC = () => {
   );
 };
 
-export default CheckEmail;
+export default VerifyOTP;

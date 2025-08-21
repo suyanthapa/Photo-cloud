@@ -24,14 +24,17 @@ const ForgotPassword: React.FC = () => {
       const res = await axios.post(`${apiBaseUrl}/api/auth/forgot-password`, {
         email,
       });
-      setMessage(" Password reset link sent to your email");
       console.log(res.data);
-      navigate("/check-email", { state: { email } });
+
+      // Navigate to OTP verification page and pass email & flow
+      navigate("/forgot-password/verify-otp", {
+        state: { email },
+      });
     } catch (err: any) {
       setMessage(
         err.response?.data?.message ||
           err.response?.data?.error ||
-          " Failed to send reset link"
+          "Failed to send reset link"
       );
     }
   };

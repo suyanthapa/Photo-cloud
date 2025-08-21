@@ -27,11 +27,18 @@ const Login: React.FC = () => {
       console.log(res.data);
       navigate("/dashboard");
     } catch (err: any) {
-      setMessage(
+      const msg =
         err.response?.data?.message ||
-          err.response?.data?.error ||
-          "❌ Login Failed"
-      );
+        err.response?.data?.error ||
+        "❌ Login Failed";
+
+      setMessage(msg);
+      const status = err.response.status;
+      if (status === 403) {
+        //email not verified
+        setMessage(err.response.data.message || "Email not verified");
+        navigate("/sent-email", { state: { email: formData.email } });
+      }
     }
   };
 

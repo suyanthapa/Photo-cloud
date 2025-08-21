@@ -11,12 +11,8 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Helper to generate a 6-digit token
-function generateToken(): string {
-  return (100000 + Math.floor(Math.random() * 900000)).toString();
-}
 // Generic function to send emails — no token generation here
-async function sendEmail(
+export async function sendEmail(
   to: string,
   subject: string,
   html: string,
@@ -34,33 +30,54 @@ async function sendEmail(
   return info;
 }
 
+//predefined templates
+export function emailTemplateVerify(token: string) {
+  const subject = "Verify your Email";
+  const text = `Use this OTP to verify your email: ${token}`;
+  const html = `<p>Dear User,</p>
+    <p>Please use the following OTP to verify your email address:</p>
+    <p><b style="font-size: 20px;">${token}</b></p>
+    <p>Do not share this OTP with anyone.</p>`;
+  return { subject, text, html };
+}
+
+export function emailTemplateForgotPassword(token: string) {
+  const subject = "Password Recovery - Verify Your Email";
+  const text = `Use this OTP to reset your password: ${token}`;
+  const html = `<p>Dear User,</p>
+    <p>Please use the following OTP to reset your password:</p>
+    <p><b style="font-size: 20px;">${token}</b></p>
+    <p>Do not share this OTP with anyone.</p>`;
+  return { subject, text, html };
+}
+
 // 📩 Specific email sending function for verify email while registering
-export const verifyUserEmail = async (userEmail: string) => {
-  const token = generateToken(); // generate here only once
-  const subject = "Password Recovery - Verify Your Email";
-  const text = `Hello, use the token to verify your email: ${token}`;
-  const html = `<p>Dear User,</p>
-    <p>Please use the following token to verify your email address:</p>
-    <p><b style="font-size: 20px;">${token}</b></p>
-    <p>Do not share this token with anyone.</p>
-    <p>Thank you,<br />The photoCloud Team</p>`;
+// export const verifyUserEmail = async (userEmail: string) => {
+//   const token = generateToken(); // generate here only once
+//   const subject = "Password Recovery - Verify Your Email";
+//   const text = `Hello, use the token to verify your email: ${token}`;
+//   const html = `<p>Dear User,</p>
+//     <p>Please use the following token to verify your email address:</p>
+//     <p><b style="font-size: 20px;">${token}</b></p>
+//     <p>Do not share this token with anyone.</p>
+//     <p>Thank you,<br />The photoCloud Team</p>`;
 
-  const info = await sendEmail(userEmail, subject, html, text);
-  console.log("token by function", token);
-  return { token, info }; // return the SAME token
-};
+//   const info = await sendEmail(userEmail, subject, html, text);
+//   console.log("token by function", token);
+//   return { token, info }; // return the SAME token
+// };
 
-export const forgotPasswordEmail = async (userEmail: string) => {
-  const token = generateToken(); // generate here only once
-  const subject = "Password Recovery - Verify Your Email";
-  const text = `Hello, use the token to verify your email: ${token}`;
-  const html = `<p>Dear User,</p>
-    <p>Please use the following token to verify your email address:</p>
-    <p><b style="font-size: 20px;">${token}</b></p>
-    <p>Do not share this token with anyone.</p>
-    <p>Thank you,<br />The photoCloud Team</p>`;
+// export const forgotPasswordEmail = async (userEmail: string) => {
+//   const token = generateToken(); // generate here only once
+//   const subject = "Password Recovery - Verify Your Email";
+//   const text = `Hello, use the token to verify your email: ${token}`;
+//   const html = `<p>Dear User,</p>
+//     <p>Please use the following token to verify your email address:</p>
+//     <p><b style="font-size: 20px;">${token}</b></p>
+//     <p>Do not share this token with anyone.</p>
+//     <p>Thank you,<br />The photoCloud Team</p>`;
 
-  const info = await sendEmail(userEmail, subject, html, text);
-  console.log("token by function", token);
-  return { token, info }; // return the SAME token
-};
+//   const info = await sendEmail(userEmail, subject, html, text);
+//   console.log("token by function", token);
+//   return { token, info }; // return the SAME token
+// };

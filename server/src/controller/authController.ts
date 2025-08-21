@@ -4,8 +4,10 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { error } from "console";
-import { verifyUserEmail, forgotPasswordEmail } from "../services/mailer";
+
 import { findUserByEmail } from "../utils/userHelper";
+import { createAndSendOTP, verifyOTP } from "../services/otpService";
+import { createUser, markUserVerified } from "../services/userService";
 const client = new PrismaClient();
 dotenv.config(); // Load .env varia
 
@@ -20,21 +22,18 @@ const register = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // 2️⃣ Hash password
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
 
-    // 3️⃣ Create new user
-    const user = await client.user.create({
-      data: {
-        email,
-        username,
-        password: hashedPassword,
-      },
-    });
+    //  Create new user
+    const user = await createUser(email, username, hashedPassword);
 
-    res.status(201).json({
+    //send  verify otp
+    await createAndSendOTP(email, "verify", user.id);
+
+    res.status(200).json({
       user,
-      message: "New user created successfully",
+      message: "User Created and Mail sent successfully",
     });
   } catch (e: unknown) {
     console.error("Register error:", e);
@@ -67,6 +66,15 @@ const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    if (existingUser.isEmailVerified === false) {
+      //send  verify otp
+      await createAndSendOTP(email, "verify", existingUser.id);
+      res.status(403).json({
+        message: "Email not verified. Verification OTP sent to your email.",
+      });
+      return;
+    }
+
     //generate token
     const token = jwt.sign(
       {
@@ -84,7 +92,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
       sameSite: "none",
     });
 
-    res.status(201).json({
+    res.status(200).json({
       token: token,
       message: "User Logged In ",
     });
@@ -99,44 +107,30 @@ const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 //verify email from  OTP
-const verifyRegisterOtp = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+const verifyInputOTP = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, OTP } = req.body;
+    const { email, otp } = req.body;
 
-    //  Get OTP record from EmailVerification table
-    const otpDoc = await client.emailVerification.findFirst({
-      where: { email, used: false },
-      orderBy: { createdAt: "desc" }, // get latest
+    const result = await verifyOTP(email, otp);
+
+    if (!result.valid) {
+      res.status(400).json({ message: result.message });
+      return;
+    }
+
+    // Mark user as verified
+    const user = await findUserByEmail(email);
+    if (!user) {
+      res.status(400).json({ error: "User doesnot exist" });
+      return;
+    }
+    if (user.isEmailVerified === false) {
+      await markUserVerified(email);
+    }
+
+    await client.emailVerification.deleteMany({
+      where: { email },
     });
-
-    if (!otpDoc) {
-      res.status(400).json({ message: "OTP not found or already used" });
-      return;
-    }
-
-    // Check if OTP expired
-    if (otpDoc.expiresAt < new Date()) {
-      res.status(400).json({ message: "OTP expired" });
-      return;
-    }
-
-    //  Compare OTP
-    if (otpDoc.otp != OTP) {
-      res.status(400).json({ message: "Invalid OTP" });
-      return;
-    }
-
-    //  Mark OTP as used
-    await client.emailVerification.update({
-      where: { id: otpDoc.id },
-      data: {
-        used: true,
-      },
-    });
-
     res.status(200).json({
       message: "OTP verified successfully",
     });
@@ -149,69 +143,7 @@ const verifyRegisterOtp = async (
 };
 
 //for forgot password otp verification
-const verifyForgotPasswordOtp = verifyRegisterOtp;
-
-// Send OTP for user registration
-const sendRegisterOtp = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { email } = req.body;
-
-    const user = await findUserByEmail(email);
-    if (user) {
-      res.status(400).json({ error: "User already exists" });
-      return;
-    }
-
-    // 2 Check if OTP already exists for this email & delete it
-    const existingOTP = await client.emailVerification.findFirst({
-      where: { email, used: false },
-    });
-
-    if (existingOTP) {
-      await client.emailVerification.deleteMany({
-        where: { email },
-      });
-    }
-    // Call the function to send the verify email
-    const { token, info } = await verifyUserEmail(email);
-
-    const expiryOTP = new Date(Date.now() + 10 * 60 * 1000); // valid for 10 minutes
-
-    await client.emailVerification.create({
-      data: {
-        email,
-        otp: token, // plain
-        expiresAt: expiryOTP,
-        used: false,
-        userId: null,
-      },
-    });
-
-    const otpDoc = await client.emailVerification.findFirst({
-      where: { email, used: false },
-      orderBy: { createdAt: "desc" },
-    });
-
-    res.status(200).json({
-      details: [
-        {
-          message: "Otp Sent Successfully",
-          user,
-        },
-      ],
-    });
-    return;
-  } catch (e: unknown) {
-    console.error("Send OTP error:", e);
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-      return;
-    } else {
-      res.status(500).json({ message: "An unknown error occurred" });
-      return;
-    }
-  }
-};
+const verifyForgotPasswordOtp = verifyInputOTP;
 
 const forgotPassword = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -233,25 +165,8 @@ const forgotPassword = async (req: Request, res: Response): Promise<void> => {
         where: { email },
       });
     }
-    // Call the function to send the verify email
-    const { token, info } = await forgotPasswordEmail(email);
-
-    const expiryOTP = new Date(Date.now() + 10 * 60 * 1000); // valid for 10 minutes
-
-    await client.emailVerification.create({
-      data: {
-        email,
-        otp: token, // plain
-        expiresAt: expiryOTP,
-        used: false,
-        userId: null,
-      },
-    });
-
-    const otpDoc = await client.emailVerification.findFirst({
-      where: { email, used: false },
-      orderBy: { createdAt: "desc" },
-    });
+    //create and send otp
+    await createAndSendOTP(email, "forgot", user.id);
 
     res.status(200).json({
       details: [
@@ -300,9 +215,7 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
       },
     });
 
-    res.status(201).json({
-      message: "User Logged In ",
-    });
+    res.status(200).json({ message: "Password reset successfully" });
   } catch (e: unknown) {
     console.error("Login error:", e);
     if (e instanceof Error) {
@@ -316,8 +229,8 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
 const authController = {
   register,
   login,
-  verifyRegisterOtp,
-  sendRegisterOtp,
+  verifyInputOTP,
+
   forgotPassword,
   verifyForgotPasswordOtp,
   resetPassword,
