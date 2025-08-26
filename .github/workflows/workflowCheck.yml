@@ -1,0 +1,10 @@
+name: workflowCheck   # Name of the workflow
+
+on: push            # Trigger: runs whenever you push to the repo
+
+jobs:               # Defines jobs to run
+  my-job:           # Job ID (you can name it anything)
+    runs-on: ubuntu-latest   # Runner environment
+    steps:          # Steps inside the job
+      - name: my-step        # Step name
+        run: echo "Hello World!"   # Command to run
