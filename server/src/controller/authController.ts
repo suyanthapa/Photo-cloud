@@ -24,9 +24,11 @@ const register = async (req: Request, res: Response): Promise<void> => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
-
+    console.log("Hashed pw is", hashedPassword);
     //  Create new user
-    const user = await createUser(email, username, hashedPassword);
+    const user = await client.user.create({
+      data: { email, username, password: hashedPassword },
+    });
 
     //send  verify otp
     await createAndSendOTP(email, "verify", user.id);

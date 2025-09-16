@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
-import forgotPasswordIcon from "../assets/forgot-password.jpg";
+import forgotPasswordIcon from "../../assets/forgot-password.jpg";
 
 const ForgotPassword: React.FC = () => {
   const apiBaseUrl = import.meta.env.VITE_API_URL;

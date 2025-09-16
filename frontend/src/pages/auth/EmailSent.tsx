@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import confirmationEmailIcon from "../assets/confirmation-email.jpg";
+import confirmationEmailIcon from "../../assets/confirmation-email.jpg";
 
 const SentEmail: React.FC = () => {
   const navigate = useNavigate();

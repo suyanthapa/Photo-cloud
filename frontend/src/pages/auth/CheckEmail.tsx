@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
-import EmailSentIcon from "../assets/email-sent-icon-vector.jpg";
+import EmailSentIcon from "../../assets/email-sent-icon-vector.jpg";
 
 const VerifyOTP: React.FC = () => {
   const apiBaseUrl = import.meta.env.VITE_API_URL;

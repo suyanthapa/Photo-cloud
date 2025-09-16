@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: photocloud-db
+    environment:
+      POSTGRES_USER: photocloud_user
+      POSTGRES_PASSWORD: photocloud_pass
+      POSTGRES_DB: photocloud
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    image: suyanthapa/photo-cloud-backend:v1.0 
+    container_name: photocloud-backenda
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./server/.env
+    depends_on:
+      - db
+
+  
+  frontend:
+    image: suyanthapa/photo-cloud-frontend:v1.0 
+    container_name: photocloud-frontenda
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

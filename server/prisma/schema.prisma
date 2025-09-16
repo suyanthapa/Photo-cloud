@@ -29,12 +29,12 @@ model uploadData {
   userId Int
   user   User @relation("OwnerUploads", fields: [userId], references: [id])
 
-  shares PhotoShare[] // 🔁 Sharing relation
+  shares PhotoShare[] @relation("PhotoShares")
 }
 
 model PhotoShare {
   id      Int        @id @default(autoincrement())
-  photo   uploadData @relation(fields: [photoId], references: [id])
+  photo   uploadData @relation("PhotoShares", fields: [photoId], references: [id], onDelete: Cascade)
   photoId Int
 
   sharedBy   User @relation("SharedBy", fields: [sharedById], references: [id])

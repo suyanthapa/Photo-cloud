@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "../../components/ui/button";
-import ResetPasswordIcon from "../assets/reset-password.png";
+import ResetPasswordIcon from "../../assets/reset-password.png";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
