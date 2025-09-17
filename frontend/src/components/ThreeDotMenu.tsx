@@ -1,18 +1,14 @@
-import  { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { MoreVertical } from "lucide-react";
 import axios, { type AxiosRequestConfig } from "axios";
 
-
-
-
-export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
+export default function ThreeDotMenu({ uploadedId }: { uploadedId: number }) {
   const [open, setOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-   const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
-    const apiBaseUrl = import.meta.env.VITE_API_URL;
-  
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -26,42 +22,39 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
     };
   }, []);
 
-  const handleEdit = async () =>{
-    
+  const handleEdit = async () => {
     setOpen(false);
-
-  }
+  };
 
   const handleDelete = async () => {
     setShowConfirmModal(true);
     setOpen(false); // close the dropdown
- 
   };
 
-  const handleConfirmDelete = async() => {
-     try{
-      const config: AxiosRequestConfig ={
-        data: {uploadedId},
-        withCredentials : true
-      }
-      console.log("Handle confirm Delete ------ID returned is :",uploadedId)
-        const res = await axios.delete(
-        `${apiBaseUrl}/api/data/deleteData`,config
+  const handleConfirmDelete = async () => {
+    try {
+      const config: AxiosRequestConfig = {
+        data: { uploadedId },
+        withCredentials: true,
+      };
+      console.log("Handle confirm Delete ------ID returned is :", uploadedId);
+      const res = await axios.delete(
+        `${apiBaseUrl}/api/data/deleteData`,
+        config
       );
       window.location.reload();
-      
-       setMessage('Deleted Successfully');
-       console.log("response is",res.data);
-    }
-    catch (err: any) {
+
+      setMessage("Deleted Successfully");
+      console.log("response is", res.data);
+    } catch (err: any) {
       setMessage(
         err.response?.data?.message ||
-        err.response?.data?.error ||
-        'Deletion failed.'
+          err.response?.data?.error ||
+          "Deletion failed."
       );
-    } 
+    }
 
-     setShowConfirmModal(false);
+    setShowConfirmModal(false);
   };
 
   const handleCancel = () => {
@@ -77,13 +70,13 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
         >
           <MoreVertical className="h-5 w-5" />
         </button>
-      
+
         {open && (
           <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-50">
             <div className="py-1">
               <button
-              onClick={handleEdit}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={handleEdit}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 Edit
               </button>
@@ -102,17 +95,17 @@ export default function ThreeDotMenu({uploadedId}: {uploadedId:number}) {
       </div>
 
       {/* Display message */}
-    {message && (
-      <div className="mt-2 text-sm text-red-600 text-center">
-        {message}
-      </div>
-    )}
+      {message && (
+        <div className="mt-2 text-sm text-red-600 text-center">{message}</div>
+      )}
 
       {/* Fullscreen Confirmation Modal */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center  bg-opacity-50">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6 text-center">
-            <h2 className="text-xl font-semibold mb-4">Are you sure you want to delete?</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Are you sure you want to delete?
+            </h2>
             {/* <p className="text-gray-600 mb-6">This action cannot be undone.</p> */}
             <div className="flex justify-center gap-4">
               <button

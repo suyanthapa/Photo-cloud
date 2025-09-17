@@ -228,6 +228,25 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+//logout
+const logout = async (req: Request, res: Response): Promise<void> => {
+  try {
+    res.clearCookie("uid", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (e: unknown) {
+    console.error("Login error:", e);
+    if (e instanceof Error) {
+      res.status(500).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
+  }
+};
+
 const authController = {
   register,
   login,
@@ -236,6 +255,8 @@ const authController = {
   forgotPassword,
   verifyForgotPasswordOtp,
   resetPassword,
+
+  logout,
 };
 
 export default authController;

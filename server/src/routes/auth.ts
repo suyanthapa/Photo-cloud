@@ -2,6 +2,7 @@ import express from "express";
 import authController from "../controller/authController";
 import userValidation from "../Validation/auth";
 import validate from "../Middleware/validation";
+import getUserfromAuthToken from "../Middleware/jwtfromUser";
 
 const authRouter = express.Router();
 
@@ -38,4 +39,8 @@ authRouter.post(
   validate(userValidation.resetPassword),
   authController.resetPassword
 );
+
+//logout
+
+authRouter.post("/logout", getUserfromAuthToken, authController.logout);
 export default authRouter;

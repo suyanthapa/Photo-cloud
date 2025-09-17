@@ -1,40 +1,147 @@
-
 import { Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { User, Settings, LogOut } from "lucide-react";
+import { logout } from "../service/authService";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  //close dropdown if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleViewProfile = () => {
+    setOpen(false);
+    console.log("View Profile clicked");
+  };
+  const handleChangePassword = () => {
+    setOpen(false);
+    console.log("Change Password clicked");
+  };
+  const handleLogout = async () => {
+    const result = await logout();
+
+    if (result.success) {
+      navigate("/login"); // redirect to login page
+    } else {
+      setMessage(result.message); // show error
+    }
+  };
+
   return (
     <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e7eef4] px-10 py-3">
       <div className="flex items-center gap-4 text-[#0d151c]">
         <div className="size-4">
-          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            viewBox="0 0 48 48"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z"
               fill="currentColor"
             />
           </svg>
         </div>
-        <h2 className="text-[#0d151c] text-lg font-bold leading-tight tracking-[-0.015em]">Photo Cloud</h2>
+        <h2 className="text-[#0d151c] text-lg font-bold leading-tight tracking-[-0.015em]">
+          Photo Cloud
+        </h2>
       </div>
       <div className="flex flex-1 justify-end gap-8">
         <div className="flex items-center gap-9">
-          <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/dashboard">Home</Link>
-          <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/upload">Upload</Link>
-           <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/allPhotos">All Photos</Link>
-             <Link className="text-[#0d151c] text-sm font-medium leading-normal" to="/sharedWithMe">Shared With Me</Link>
-          <a className="text-[#0d151c] text-sm font-medium leading-normal" href="/sharedByYou">Shared By You</a>
+          <Link
+            className="text-[#0d151c] text-sm font-medium leading-normal"
+            to="/dashboard"
+          >
+            Home
+          </Link>
+          <Link
+            className="text-[#0d151c] text-sm font-medium leading-normal"
+            to="/upload"
+          >
+            Upload
+          </Link>
+          <Link
+            className="text-[#0d151c] text-sm font-medium leading-normal"
+            to="/allPhotos"
+          >
+            All Photos
+          </Link>
+          <Link
+            className="text-[#0d151c] text-sm font-medium leading-normal"
+            to="/sharedWithMe"
+          >
+            Shared With Me
+          </Link>
+          <a
+            className="text-[#0d151c] text-sm font-medium leading-normal"
+            href="/sharedByYou"
+          >
+            Shared By You
+          </a>
         </div>
         <div className="flex gap-2">
-         
           <button className="flex max-w-[480px]  cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#e7eef4] text-[#0d151c] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20px"
+              height="20px"
+              fill="currentColor"
+              viewBox="0 0 256 256"
+            >
               <path d="M200,40H56A16,16,0,0,0,40,56V200a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm0,80H136V56h64ZM120,56v64H56V56ZM56,136h64v64H56Zm144,64H136V136h64v64Z" />
             </svg>
           </button>
         </div>
-        <div
-          className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-          style={{ backgroundImage: 'url("https://cdn.usegalileo.ai/sdxl10/8eb4c70f-5045-413c-b38d-0dfa03eebade.png")' }}
-        ></div>
+
+        {/* Profile Dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <div
+            className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 h-10 cursor-pointer"
+            style={{
+              backgroundImage:
+                'url("https://cdn.usegalileo.ai/sdxl10/8eb4c70f-5045-413c-b38d-0dfa03eebade.png")',
+            }}
+            onClick={() => setOpen(!open)}
+          ></div>
+
+          {open && (
+            <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-50 py-1">
+              <button
+                onClick={handleViewProfile}
+                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                <User className="w-4 h-4" /> View Profile
+              </button>
+              <button
+                onClick={handleChangePassword}
+                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                <Settings className="w-4 h-4" /> Change Password
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+              >
+                <LogOut className="w-4 h-4" /> Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
