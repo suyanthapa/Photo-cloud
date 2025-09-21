@@ -6,16 +6,14 @@ import UploadPage from "./pages/dashboard/upload";
 import AllPhotos from "./pages/dashboard/AllPhotos";
 import InsideImage from "./components/InsideImage";
 import SharedPhotosPage from "./pages/dashboard/SharedByYou";
-
 import SharedWithMe from "./pages/dashboard/SharedWithMe";
 import ViewSharedPhoto from "./components/ViewSharedPhoto";
 import ForgotPassword from "./pages/auth/ForgotPasword";
-
 import ResetPassword from "./pages/auth/ResetPassword";
-
 import SentEmail from "./pages/auth/EmailSent";
-// import VerifyOTP from "./pages/CheckEmail";
 import OtpVerification from "./components/OtpVerification";
+import UpdatePassword from "./pages/profile/updatePassword";
+import ViewProfile from "./pages/profile/viewProfile";
 
 function App() {
   return (
@@ -40,6 +38,9 @@ function App() {
         <Route path="/sharedByYou/photo/:id" element={<InsideImage />} />
         <Route path="/sharedWithMe" element={<SharedWithMe />} />
         <Route path="/sharedWithMe/photo/:id" element={<ViewSharedPhoto />} />
+
+        <Route path="/update-password" element={<UpdatePassword />} />
+        <Route path="/view-profile" element={<ViewProfile />} />
       </Routes>
     </Router>
   );

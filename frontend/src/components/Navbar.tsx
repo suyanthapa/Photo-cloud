@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import { User, Settings, LogOut } from "lucide-react";
 import { logout } from "../service/authService";
 import { useNavigate } from "react-router-dom";
+import Logout from "../pages/profile/logout";
+import UpdatePassword from "../pages/profile/updatePassword";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -26,12 +28,14 @@ export default function Navbar() {
 
   const handleViewProfile = () => {
     setOpen(false);
-    console.log("View Profile clicked");
+    navigate("/view-profile"); // redirect to profile page
   };
-  const handleChangePassword = () => {
+
+  const handleUpdatePassword = () => {
     setOpen(false);
-    console.log("Change Password clicked");
+    navigate("/update-password"); // redirect to the Change Password page
   };
+
   const handleLogout = async () => {
     const result = await logout();
 
@@ -128,17 +132,12 @@ export default function Navbar() {
                 <User className="w-4 h-4" /> View Profile
               </button>
               <button
-                onClick={handleChangePassword}
+                onClick={handleUpdatePassword}
                 className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <Settings className="w-4 h-4" /> Change Password
               </button>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-              >
-                <LogOut className="w-4 h-4" /> Logout
-              </button>
+              <Logout />
             </div>
           )}
         </div>

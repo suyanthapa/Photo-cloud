@@ -27,11 +27,7 @@ authRouter.post(
 );
 
 //forgot password --sends otp
-authRouter.post(
-  "/forgot-password",
-
-  authController.forgotPassword
-);
+authRouter.post("/forgot-password", authController.forgotPassword);
 
 //reset password
 authRouter.post(
@@ -41,6 +37,21 @@ authRouter.post(
 );
 
 //logout
-
 authRouter.post("/logout", getUserfromAuthToken, authController.logout);
+
+//reset password
+authRouter.post(
+  "/update-password",
+  getUserfromAuthToken,
+  validate(userValidation.updatePassword),
+  authController.updatePassword
+);
+
+//view profile
+authRouter.get(
+  "/me",
+  getUserfromAuthToken,
+
+  authController.me
+);
 export default authRouter;

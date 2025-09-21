@@ -3,11 +3,10 @@ import { Request, Response } from "express";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { error } from "console";
-
 import { findUserByEmail } from "../utils/userHelper";
 import { createAndSendOTP, verifyOTP } from "../services/otpService";
 import { createUser, markUserVerified } from "../services/userService";
+import IRequest from "../Middleware/IRequest";
 const client = new PrismaClient();
 dotenv.config(); // Load .env varia
 
@@ -247,6 +246,93 @@ const logout = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const updatePassword = async (req: IRequest, res: Response): Promise<void> => {
+  try {
+    const userId = Number(req.userId);
+
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized: User ID missing" });
+      return;
+    }
+    const user = await client.user.findUnique({
+      where: { id: Number(userId) },
+    });
+    if (!user) {
+      res.status(400).json({ error: "User doesnot exist" });
+      return;
+    }
+    // Compare current password with hashed password
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+    if (!isPasswordValid) {
+      res.status(401).json({ message: "Invalid Current Password" });
+      return;
+    }
+
+    if (newPassword != confirmPassword) {
+      res.status(401).json({ message: "Password don't match" });
+      return;
+    }
+
+    //  Hash password
+    const hashedPassword = await bcrypt.hash(newPassword, 10); // 10 = salt rounds
+
+    await client.user.update({
+      where: { id: Number(userId) },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (e: unknown) {
+    console.error("Login error:", e);
+    if (e instanceof Error) {
+      res.status(500).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
+  }
+};
+
+const me = async (req: IRequest, res: Response): Promise<void> => {
+  try {
+    const userId = Number(req.userId);
+
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized: User ID missing" });
+      return;
+    }
+    const user = await client.user.findUnique({
+      where: { id: Number(userId) },
+    });
+    if (!user) {
+      res.status(400).json({ error: "User doesnot exist" });
+      return;
+    }
+
+    //extracct name , email, isEmailVerified
+    const { id, username, email, isEmailVerified, createdAt } = user;
+
+    res
+      .status(200)
+      .json({
+        message: "Profile shown successfully",
+        user: { id, username, email, isEmailVerified, createdAt },
+      });
+  } catch (e: unknown) {
+    console.error("profile view error:", e);
+    if (e instanceof Error) {
+      res.status(500).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
+  }
+};
+
 const authController = {
   register,
   login,
@@ -257,6 +343,8 @@ const authController = {
   resetPassword,
 
   logout,
+  updatePassword,
+  me,
 };
 
 export default authController;
