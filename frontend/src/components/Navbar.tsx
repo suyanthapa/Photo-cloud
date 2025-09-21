@@ -1,14 +1,13 @@
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { User, Settings, LogOut } from "lucide-react";
-import { logout } from "../service/authService";
+import { User, Settings } from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
 import Logout from "../pages/profile/logout";
-import UpdatePassword from "../pages/profile/updatePassword";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -34,16 +33,6 @@ export default function Navbar() {
   const handleUpdatePassword = () => {
     setOpen(false);
     navigate("/update-password"); // redirect to the Change Password page
-  };
-
-  const handleLogout = async () => {
-    const result = await logout();
-
-    if (result.success) {
-      navigate("/login"); // redirect to login page
-    } else {
-      setMessage(result.message); // show error
-    }
   };
 
   return (
