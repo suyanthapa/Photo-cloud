@@ -267,12 +267,68 @@ const deleteData = async (req: IRequest, res: Response): Promise<void> => {
   }
 };
 
+const getImagesUsingPagination = async (
+  req: IRequest,
+  res: Response
+): Promise<void> => {
+  const page = parseInt(req.query.page as string);
+  const limit = parseInt(req.query.limit as string);
+
+  try {
+    const userId = req.userId;
+
+    const existingUser = await client.user.findUnique({
+      where: {
+        id: Number(userId),
+      },
+    });
+
+    if (!existingUser) {
+      res.status(400).json({ error: "User doesnot exist" });
+      return;
+    }
+
+    const [images, total] = await Promise.all([
+      client.uploadData.findMany({
+        where: {
+          userId: Number(userId),
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+      }),
+      client.uploadData.count({
+        where: {
+          userId: Number(userId),
+        },
+      }),
+    ]);
+
+    res.status(201).json({
+      data: images,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+    });
+    return;
+  } catch (e: unknown) {
+    console.error("View Uploaded Data using Pagination Error:", e);
+
+    if (e instanceof Error) {
+      res.status(500).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "An unknown erro occured" });
+    }
+  }
+};
+
 const uploadController = {
   uploadData,
   viewUploadedData,
   viewSingleData,
   editData,
   deleteData,
+
+  getImagesUsingPagination,
 };
 
 export default uploadController;

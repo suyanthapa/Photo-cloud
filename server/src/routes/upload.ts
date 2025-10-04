@@ -1,39 +1,52 @@
-import express from 'express';
+import express from "express";
 
-import userValidation from '../Validation/auth';
-import validate from '../Middleware/validation';
-import upload from '../Middleware/multerConfig';
-import uploadController from '../controller/uploadController';
-import getUserfromAuthToken from '../Middleware/jwtfromUser';
+import userValidation from "../Validation/auth";
+import validate from "../Middleware/validation";
+import upload from "../Middleware/multerConfig";
+import uploadController from "../controller/uploadController";
+import getUserfromAuthToken from "../Middleware/jwtfromUser";
 
 const uploadRouter = express.Router();
 
-export const userUpload = upload.single('photo');
-
-
+export const userUpload = upload.single("photo");
 
 //Upload  User Photo
-uploadRouter.post('/upload', userUpload,getUserfromAuthToken, uploadController.uploadData);
+uploadRouter.post(
+  "/upload",
+  userUpload,
+  getUserfromAuthToken,
+  uploadController.uploadData
+);
 
 //view uploaded data
-uploadRouter.get('/viewData', getUserfromAuthToken,uploadController.viewUploadedData);
+uploadRouter.get(
+  "/viewData",
+  getUserfromAuthToken,
+  uploadController.viewUploadedData
+);
 
 //view uploaded single data
-uploadRouter.get('/viewSingleData/:id', getUserfromAuthToken,uploadController.viewSingleData);
+uploadRouter.get(
+  "/viewSingleData/:id",
+  getUserfromAuthToken,
+  uploadController.viewSingleData
+);
 
 //edit uploaded data
-uploadRouter.put('/editData', getUserfromAuthToken,uploadController.editData);
-
+uploadRouter.put("/editData", getUserfromAuthToken, uploadController.editData);
 
 //delete uploaded data
-uploadRouter.delete('/deleteData', getUserfromAuthToken,uploadController.deleteData);
+uploadRouter.delete(
+  "/deleteData",
+  getUserfromAuthToken,
+  uploadController.deleteData
+);
 
-
-
-
+//view  uploaded data using pagination
+uploadRouter.get(
+  "/images",
+  getUserfromAuthToken,
+  uploadController.getImagesUsingPagination
+);
 
 export default uploadRouter;
-
-
- 
- 
