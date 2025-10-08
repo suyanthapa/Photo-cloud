@@ -23,7 +23,7 @@ const ViewSharedPhoto: React.FC = () => {
   const [sharedGmail, setSharedGmail] = useState("");
   const [shared, setShared] = useState(false);
 
-   const apiBaseUrl = import.meta.env.VITE_API_URL;
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchPhoto = async () => {
@@ -101,7 +101,7 @@ const ViewSharedPhoto: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header with back button */}
         <div className="flex items-center gap-4 mb-6">
@@ -141,13 +141,17 @@ const ViewSharedPhoto: React.FC = () => {
                 <User className="w-5 h-5" />
                 Photo Information
               </h3>
-              
+
               <div className="space-y-4">
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Description
+                  </label>
                   <div className="p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-900">{photoData.description}</span>
+                    <span className="text-gray-900">
+                      {photoData.description}
+                    </span>
                   </div>
                 </div>
 
@@ -158,7 +162,9 @@ const ViewSharedPhoto: React.FC = () => {
                     Upload Date
                   </label>
                   <div className="p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-900">{formatDate(photoData.createdAt)}</span>
+                    <span className="text-gray-900">
+                      {formatDate(photoData.createdAt)}
+                    </span>
                   </div>
                 </div>
 
@@ -169,7 +175,9 @@ const ViewSharedPhoto: React.FC = () => {
                     Shared By
                   </label>
                   <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <span className="text-blue-800 font-medium">{photoData.user.email}</span>
+                    <span className="text-blue-800 font-medium">
+                      {photoData.user.email}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -196,7 +204,7 @@ const ViewSharedPhoto: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Email Address
                     </label>
-                    <input 
+                    <input
                       type="email"
                       value={sharedGmail}
                       placeholder="Enter email address"

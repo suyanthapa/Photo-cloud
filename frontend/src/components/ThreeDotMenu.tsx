@@ -35,7 +35,7 @@ export default function ThreeDotMenu({ uploadedId }: { uploadedId: number }) {
   const handleConfirmDelete = async () => {
     setIsDeleting(true);
     setMessage(""); // Clear any previous messages
-    
+
     try {
       const config: AxiosRequestConfig = {
         data: { uploadedId },
@@ -46,15 +46,14 @@ export default function ThreeDotMenu({ uploadedId }: { uploadedId: number }) {
         `${apiBaseUrl}/api/data/deleteData`,
         config
       );
-      
+
       setMessage("Deleted Successfully");
       console.log("response is", res.data);
-      
+
       // Delay reload slightly to show success message
       setTimeout(() => {
         window.location.reload();
       }, 1000);
-      
     } catch (err: any) {
       setMessage(
         err.response?.data?.message ||
@@ -115,36 +114,42 @@ export default function ThreeDotMenu({ uploadedId }: { uploadedId: number }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6 text-center">
             <h2 className="text-xl font-semibold mb-4">
-              {isDeleting ? "Deleting Photo..." : "Are you sure you want to delete?"}
+              {isDeleting
+                ? "Deleting Photo..."
+                : "Are you sure you want to delete?"}
             </h2>
-            
+
             {isDeleting && (
               <div className="flex justify-center mb-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
               </div>
             )}
-            
+
             {!isDeleting && (
-              <p className="text-gray-600 mb-6">This action cannot be undone.</p>
+              <p className="text-gray-600 mb-6">
+                This action cannot be undone.
+              </p>
             )}
 
             {message && (
-              <div className={`mb-4 p-3 rounded-lg text-sm font-medium ${
-                message.includes("Successfully") 
-                  ? "text-green-800 bg-green-50 border border-green-200" 
-                  : "text-red-800 bg-red-50 border border-red-200"
-              }`}>
+              <div
+                className={`mb-4 p-3 rounded-lg text-sm font-medium ${
+                  message.includes("Successfully")
+                    ? "text-green-800 bg-green-50 border border-green-200"
+                    : "text-red-800 bg-red-50 border border-red-200"
+                }`}
+              >
                 {message}
               </div>
             )}
-            
+
             <div className="flex justify-center gap-4">
               <button
                 onClick={handleConfirmDelete}
                 disabled={isDeleting}
                 className={`font-semibold py-2 px-4 rounded transition-colors ${
-                  isDeleting 
-                    ? "bg-gray-400 text-gray-600 cursor-not-allowed" 
+                  isDeleting
+                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
                     : "bg-red-600 hover:bg-red-700 text-white"
                 }`}
               >
@@ -154,8 +159,8 @@ export default function ThreeDotMenu({ uploadedId }: { uploadedId: number }) {
                 onClick={handleCancel}
                 disabled={isDeleting}
                 className={`font-semibold py-2 px-4 rounded transition-colors ${
-                  isDeleting 
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed" 
+                  isDeleting
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                     : "bg-gray-300 hover:bg-gray-400 text-black"
                 }`}
               >
