@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Button } from "../../components/ui/button";
+import { Spinner } from "../../components/ui/spinner";
+import AuthHeader from "../../components/AuthHeader";
+import { authTheme } from "../../styles/authTheme";
 import ResetPasswordIcon from "../../assets/reset-password.png";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -16,6 +19,7 @@ const ResetPassword: React.FC = () => {
     confirmPassword: "",
   });
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // Example password strength function
   const passwordStrength = (password: string) => {
@@ -30,39 +34,58 @@ const ResetPassword: React.FC = () => {
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setMessage(""); // Clear any previous messages
 
-    const res = await axios.post(`${apiBaseUrl}/api/auth/reset-password`, {
-      email,
-      password: formData.password,
-      confirmPassword: formData.confirmPassword,
-    });
-    setMessage(" OTP Validated Successfully");
-    console.log(res.data);
-    navigate("/login");
+    try {
+      const res = await axios.post(`${apiBaseUrl}/api/auth/reset-password`, {
+        email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+      });
+      setMessage("✅ Password reset successfully");
+      console.log(res.data);
+      navigate("/login");
+    } catch (err: any) {
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "❌ Failed to reset password";
+      setMessage(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-orange-50 px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center border border-gray-200">
-        <div className="flex justify-center mb-4">
-          <img
-            src={ResetPasswordIcon}
-            alt="Check Email"
-            className="w-24 h-24"
-          />
+    <div
+      className={`flex items-center justify-center min-h-screen ${authTheme.backgroundGradient} px-4 relative`}
+    >
+      <AuthHeader />
+      <div
+        className={`${authTheme.card.base} ${authTheme.card.padding} text-center`}
+      >
+        <div className="flex justify-center mb-6">
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+            <img
+              src={ResetPasswordIcon}
+              alt="Reset Password"
+              className="w-12 h-12 object-contain"
+            />
+          </div>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          Reset Password
-        </h2>
-        <p className="text-gray-500 mb-6">
+        <h2 className={`mb-2 ${authTheme.text.title}`}>Reset Password</h2>
+        <p className={`mb-6 ${authTheme.text.subtitle}`}>
           Please kindly set your new password
         </p>
 
         {message && (
           <p
-            className={`text-sm mb-4 ${
-              message.includes("success") ? "text-green-600" : "text-red-500"
+            className={`text-sm mb-4 font-medium ${
+              message.includes("✅")
+                ? authTheme.text.success
+                : authTheme.text.error
             }`}
           >
             {message}
@@ -71,7 +94,7 @@ const ResetPassword: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5 text-left">
           <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-700">
+            <label className={`block mb-2 ${authTheme.text.label}`}>
               New password
             </label>
             <input
@@ -79,16 +102,17 @@ const ResetPassword: React.FC = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all outline-none"
+              disabled={isLoading}
+              className={`${authTheme.input.base} ${authTheme.input.focus} ${authTheme.input.background}`}
               required
             />
-            <p className="text-sm mt-1 text-green-600">
+            <p className={`text-sm mt-1 ${authTheme.text.success}`}>
               Password strength: {passwordStrength(formData.password)}
             </p>
           </div>
 
           <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-700">
+            <label className={`block mb-2 ${authTheme.text.label}`}>
               Confirm password
             </label>
             <input
@@ -96,16 +120,25 @@ const ResetPassword: React.FC = () => {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all outline-none"
+              disabled={isLoading}
+              className={`${authTheme.input.base} ${authTheme.input.focus} ${authTheme.input.background}`}
               required
             />
           </div>
 
           <Button
             type="submit"
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-semibold"
+            disabled={isLoading}
+            className={`${authTheme.primaryButton.base} ${authTheme.primaryButton.gradient} ${authTheme.primaryButton.shadow}`}
           >
-            Save Changes
+            {isLoading ? (
+              <div className="flex items-center gap-2 justify-center">
+                <Spinner size="sm" />
+                <span>Saving Changes...</span>
+              </div>
+            ) : (
+              "Save Changes"
+            )}
           </Button>
         </form>
       </div>

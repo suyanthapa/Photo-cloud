@@ -10,24 +10,38 @@ import sharedRouter from "./routes/share";
 dotenv.config();
 const server = express();
 
-server.use(express.json());
+const allowedOrigins = [
+  "http://localhost:5174",
+  "https://photo-cloud-delta.vercel.app",
+];
+
 server.use(
-  cors({ origin: "https://photo-cloud-delta.vercel.app", credentials: true })
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin like mobile apps or Postman
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
 );
+
+server.use(express.json());
+server.use(express.urlencoded({ extended: true }));
+server.use(cookieParser());
 
 server.use(
   "/uploads",
   express.static(path.join(__dirname, "../public/assets/documents/photo"))
 );
 
-// server.use(cors({ origin: "http://localhost:5173", credentials: true }));
-
-server.use(express.urlencoded({ extended: true }));
-server.use(cookieParser());
 server.use("/api/auth", authRouter);
-
 server.use("/api/data", uploadRouter);
 server.use("/api/data/share", sharedRouter);
+
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {

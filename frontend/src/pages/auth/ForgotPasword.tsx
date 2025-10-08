@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
+import { Spinner } from "../../components/ui/spinner";
+import AuthHeader from "../../components/AuthHeader";
+import { authTheme } from "../../styles/authTheme";
 import {
   Card,
   CardContent,
@@ -16,10 +19,14 @@ const ForgotPassword: React.FC = () => {
   const apiBaseUrl = import.meta.env.VITE_API_URL;
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setMessage(""); // Clear any previous messages
+
     try {
       const res = await axios.post(`${apiBaseUrl}/api/auth/forgot-password`, {
         email,
@@ -36,30 +43,39 @@ const ForgotPassword: React.FC = () => {
           err.response?.data?.error ||
           "Failed to send reset link"
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 px-4">
-      <Card className="w-full max-w-md rounded-2xl shadow-xl border border-gray-200 bg-white backdrop-blur-sm">
+    <div
+      className={`flex min-h-screen items-center justify-center ${authTheme.backgroundGradient} px-4 relative`}
+    >
+      <AuthHeader />
+      <Card className={`${authTheme.card.base} ${authTheme.card.padding}`}>
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-7">
-            <img
-              src={forgotPasswordIcon}
-              alt="Check Email"
-              className="w-40 h-50"
-            />
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+              <img
+                src={forgotPasswordIcon}
+                alt="Forgot Password"
+                className="w-12 h-12 object-contain"
+              />
+            </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-800">
+          <CardTitle className={authTheme.text.title}>
             Forgot your password?
           </CardTitle>
-          <CardDescription className="mt-1 text-gray-500">
+          <CardDescription className={`mt-1 ${authTheme.text.subtitle}`}>
             Enter your email so we can send you a password reset link
           </CardDescription>
           {message && (
             <p
               className={`mt-3 text-sm font-medium ${
-                message.includes("✅") ? "text-green-600" : "text-red-500"
+                message.includes("✅")
+                  ? authTheme.text.success
+                  : authTheme.text.error
               }`}
             >
               {message}
@@ -70,15 +86,16 @@ const ForgotPassword: React.FC = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block mb-1 text-sm font-semibold text-gray-700">
+              <label className={`block mb-2 ${authTheme.text.label}`}>
                 Email
               </label>
               <input
                 type="email"
                 placeholder="e.g. username@example.com"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all outline-none"
+                className={`${authTheme.input.base} ${authTheme.input.focus} ${authTheme.input.background}`}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
                 required
               />
             </div>
@@ -86,17 +103,27 @@ const ForgotPassword: React.FC = () => {
             <Button
               variant="default"
               type="submit"
-              className="w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors"
+              disabled={isLoading}
+              className={`${authTheme.primaryButton.base} ${authTheme.primaryButton.gradient} ${authTheme.primaryButton.shadow}`}
             >
-              Send Email
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <Spinner size="sm" />
+                  <span>Sending Email...</span>
+                </div>
+              ) : (
+                "Send Email"
+              )}
             </Button>
           </form>
         </CardContent>
 
-        <CardFooter className="flex justify-center text-sm text-gray-600">
+        <CardFooter
+          className={`flex justify-center text-sm ${authTheme.text.subtitle}`}
+        >
           <Link
             to="/login"
-            className="flex items-center gap-1 text-gray-500 hover:text-orange-500 transition-colors"
+            className={`flex items-center gap-1 hover:underline ${authTheme.text.link} transition-colors`}
           >
             ← Back to Login
           </Link>

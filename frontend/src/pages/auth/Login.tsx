@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
+import { Spinner } from "../../components/ui/spinner";
+import AuthHeader from "../../components/AuthHeader";
+import { authTheme } from "../../styles/authTheme";
 import {
   Card,
   CardContent,
@@ -15,10 +18,14 @@ const Login: React.FC = () => {
   const apiBaseUrl = import.meta.env.VITE_API_URL;
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setMessage(""); // Clear any previous messages
+
     try {
       const res = await axios.post(`${apiBaseUrl}/api/auth/login`, formData, {
         withCredentials: true,
@@ -39,23 +46,28 @@ const Login: React.FC = () => {
         setMessage(err.response.data.message || "Email not verified");
         navigate("/sent-email", { state: { email: formData.email } });
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 px-4">
-      <Card className="w-full max-w-md rounded-2xl shadow-xl border border-gray-200 bg-white backdrop-blur-sm">
+    <div
+      className={`flex min-h-screen items-center justify-center ${authTheme.backgroundGradient} px-4 relative`}
+    >
+      <AuthHeader />
+      <Card className={`${authTheme.card.base} ${authTheme.card.padding}`}>
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gray-800">
-            Welcome Back
-          </CardTitle>
-          <CardDescription className="mt-1 text-gray-500">
+          <CardTitle className={authTheme.text.title}>Welcome Back</CardTitle>
+          <CardDescription className={`mt-1 ${authTheme.text.subtitle}`}>
             Please sign in to continue
           </CardDescription>
           {message && (
             <p
               className={`mt-3 text-sm font-medium ${
-                message.includes("✅") ? "text-green-600" : "text-red-500"
+                message.includes("✅")
+                  ? authTheme.text.success
+                  : authTheme.text.error
               }`}
             >
               {message}
@@ -66,33 +78,35 @@ const Login: React.FC = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block mb-1 text-sm font-semibold text-gray-700">
+              <label className={`block mb-2 ${authTheme.text.label}`}>
                 Email
               </label>
               <input
                 type="email"
                 placeholder="you@example.com"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all outline-none"
+                className={`${authTheme.input.base} ${authTheme.input.focus} ${authTheme.input.background}`}
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
+                disabled={isLoading}
                 required
               />
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-semibold text-gray-700">
+              <label className={`block mb-2 ${authTheme.text.label}`}>
                 Password
               </label>
               <input
                 type="password"
                 placeholder="••••••••"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all outline-none"
+                className={`${authTheme.input.base} ${authTheme.input.focus} ${authTheme.input.background}`}
                 value={formData.password}
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
+                disabled={isLoading}
                 required
               />
             </div>
@@ -100,26 +114,36 @@ const Login: React.FC = () => {
             <Button
               variant="default"
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              disabled={isLoading}
+              className={`${authTheme.primaryButton.base} ${authTheme.primaryButton.gradient} ${authTheme.primaryButton.shadow}`}
             >
-              Login
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <Spinner size="sm" />
+                  <span>Signing in...</span>
+                </div>
+              ) : (
+                "Login"
+              )}
             </Button>
           </form>
         </CardContent>
 
-        <CardFooter className="flex flex-col items-center gap-2 text-sm text-gray-600">
+        <CardFooter
+          className={`flex flex-col items-center gap-2 text-sm ${authTheme.text.subtitle}`}
+        >
           <p>
             Don't have an account?{" "}
             <Link
               to="/register"
-              className="text-blue-600 font-medium hover:underline"
+              className={`font-medium hover:underline ${authTheme.text.link}`}
             >
               Register
             </Link>
           </p>
           <Link
             to="/forgot-password"
-            className="text-blue-500 hover:underline text-xs"
+            className={`hover:underline text-xs ${authTheme.text.link}`}
           >
             Forgot your password?
           </Link>

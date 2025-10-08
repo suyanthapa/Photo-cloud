@@ -5,9 +5,14 @@ meta {
 }
 
 get {
-  url: http://localhost:8000/api/data/share/sharedToMe
+  url: http://localhost:8000/api/data/images?page=2&limit=1
   body: none
   auth: inherit
+}
+
+params:query {
+  page: 2
+  limit: 1
 }
 
 headers {

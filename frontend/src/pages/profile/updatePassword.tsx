@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { Spinner } from "../../components/ui/spinner";
 
 export default function UpdatePassword() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -7,6 +8,7 @@ export default function UpdatePassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const apiBaseUrl = import.meta.env.VITE_API_URL;
 
@@ -19,6 +21,8 @@ export default function UpdatePassword() {
       setError("New password and confirm password do not match");
       return;
     }
+
+    setIsLoading(true);
 
     try {
       const response = await axios.post(
@@ -49,6 +53,8 @@ export default function UpdatePassword() {
         // Invalid current password or unauthorized
         setError(err.response.data.message || "Invalid current password");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,7 +79,8 @@ export default function UpdatePassword() {
             type="password"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            disabled={isLoading}
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed"
             required
           />
         </div>
@@ -87,7 +94,8 @@ export default function UpdatePassword() {
             type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            disabled={isLoading}
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed"
             required
           />
         </div>
@@ -101,7 +109,8 @@ export default function UpdatePassword() {
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            disabled={isLoading}
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed"
             required
           />
         </div>
@@ -109,9 +118,17 @@ export default function UpdatePassword() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-medium py-2 px-4 rounded-lg"
+          disabled={isLoading}
+          className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-medium py-2 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Submit
+          {isLoading ? (
+            <div className="flex items-center gap-2 justify-center">
+              <Spinner size="sm" />
+              <span>Updating Password...</span>
+            </div>
+          ) : (
+            "Submit"
+          )}
         </button>
       </form>
     </div>
