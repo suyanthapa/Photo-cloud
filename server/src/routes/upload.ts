@@ -49,4 +49,11 @@ uploadRouter.get(
   uploadController.getImagesUsingPagination
 );
 
+uploadRouter.post(
+  "/stats",
+  userUpload,
+  getUserfromAuthToken,
+  uploadController.uploadData
+);
+
 export default uploadRouter;

@@ -123,93 +123,135 @@ const UploadPage: React.FC = () => {
   };
 
   return (
-    <div className="layout-container flex h-full grow flex-col">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <div className="p-10 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-9">Upload a Photo</h1>
-        {/* Upload Area */}
-        <div
-          className="bg-gray-100 rounded-xl h-80 flex flex-col items-center justify-center text-center p-6 mb-6 border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors"
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-        >
-          {previewUrl ? (
-            <div className="relative w-full h-full">
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className="object-cover h-full w-full rounded-xl"
-              />
-              <button
-                onClick={() => {
-                  setFile(null);
-                  setPreviewUrl(null);
-                }}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
-              >
-                ×
-              </button>
-            </div>
-          ) : (
-            <>
-              <p className="text-xl font-bold mb-4">
-                Drag and drop your photo here
-              </p>
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  id="fileInput"
-                />
-                <label
-                  htmlFor="fileInput"
-                  className="flex items-center border px-4 py-2 rounded-lg cursor-pointer bg-white hover:bg-gray-50 transition-colors"
-                >
-                  <span className="text-gray-600">
-                    Or select a file from your computer
-                  </span>
-                </label>
-              </div>
-            </>
-          )}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Upload Photos
+          </h1>
+          <p className="text-gray-600">
+            Share your memories with friends and family
+          </p>
         </div>
-        {/* Description Input */}
-        <textarea
-          placeholder="Add a description"
-          className="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          rows={4}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        {/* Upload Button */}
-        <button
-          onClick={handleUpload}
-          disabled={isUploading || !file || !description.trim()}
-          className="bg-blue-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-        >
-          {isUploading ? "Uploading..." : "Upload"}
-        </button>
-        Uploaded Photos Display
+        {/* Upload Card */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+          {/* Upload Area */}
+          <div
+            className="bg-gray-50 rounded-xl h-80 flex flex-col items-center justify-center text-center p-6 mb-6 border-2 border-dashed border-gray-300 hover:border-blue-400 transition-all duration-200"
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+          >
+            {previewUrl ? (
+              <div className="relative w-full h-full">
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="object-cover h-full w-full rounded-xl shadow-sm"
+                />
+                <button
+                  onClick={() => {
+                    setFile(null);
+                    setPreviewUrl(null);
+                  }}
+                  className="absolute top-3 right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-lg hover:bg-red-600 transition-colors shadow-lg"
+                >
+                  ×
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-blue-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Drop your photos here
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  or click to browse from your device
+                </p>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="fileInput"
+                  />
+                  <label
+                    htmlFor="fileInput"
+                    className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-700 transition-colors shadow-sm"
+                  >
+                    Select Photos
+                  </label>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Description Input */}
+          <div className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700">
+              Photo Description
+            </label>
+            <textarea
+              placeholder="Tell us about this photo..."
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+
+          {/* Upload Button */}
+          <button
+            onClick={handleUpload}
+            disabled={isUploading || !file || !description.trim()}
+            className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors shadow-sm"
+          >
+            {isUploading ? "Uploading..." : "Upload Photo"}
+          </button>
+        </div>
+
+        {/* Recent Uploads Section */}
         {uploads.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-xl font-bold mb-6">Your Uploaded Photos</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Recent Uploads
+              </h2>
+              <span className="text-sm text-gray-500">
+                {uploads.length} photos
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {uploads.map((upload) => (
                 <div
                   key={upload.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden"
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-200"
                 >
                   <img
                     src={upload.photo}
                     alt={upload.description}
                     className="w-full h-48 object-cover"
                   />
-
                   <div className="p-4">
-                    <p className="text-gray-700 mb-2">{upload.description}</p>
+                    <p className="text-gray-900 font-medium mb-1 line-clamp-2">
+                      {upload.description}
+                    </p>
                     <p className="text-sm text-gray-500">
                       {formatDate(upload.createdAt)}
                     </p>

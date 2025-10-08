@@ -57,42 +57,54 @@ const SharedWithMe: React.FC = () => {
   };
 
   return (
-    <div className="layout-container flex h-full grow flex-col">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <div className="p-10 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-9">Shared With Me</h1>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Shared With Me
+          </h1>
+          <p className="text-gray-600">
+            Photos that others have shared with you
+          </p>
+        </div>
 
         {received.length > 0 ? (
           <div>
-            <h2 className="text-xl font-bold mb-6">Received Photos</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {received.map((received) => (
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Received Photos ({received.length})
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {received.map((receivedItem) => (
                 <div
-                  key={received.photo.id}
-                  className="bg-white rounded-lg shadow-md relative"
+                  key={receivedItem.photo.id}
+                  className="group bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200"
                 >
-                  <img
-                    src={received.photo.photo}
-                    alt={received.photo.description || "Uploaded photo"}
-                    className="w-full h-48 object-cover"
-                    onClick={() => handleInsideImage(received.photo.id)}
-                  />
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={receivedItem.photo.photo}
+                      alt={receivedItem.photo.description || "Uploaded photo"}
+                      className="w-full h-48 object-cover cursor-pointer group-hover:scale-105 transition-transform duration-200"
+                      onClick={() => handleInsideImage(receivedItem.photo.id)}
+                    />
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <ThreeDotMenu uploadedId={receivedItem.photo.id} />
+                    </div>
+                  </div>
                   <div className="p-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-gray-700 mb-1">
-                          {received.photo.description || "No description"}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {formatDate(received.photo.createdAt)}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Shared By : {received.sharedBy.email}
-                        </p>
-                      </div>
-                      {/* Just render the ThreeDotMenu component */}
-                      <ThreeDotMenu uploadedId={received.photo.id} />
+                    <p className="text-gray-900 font-medium mb-1 line-clamp-2">
+                      {receivedItem.photo.description || "No description"}
+                    </p>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">
+                        {formatDate(receivedItem.photo.createdAt)}
+                      </p>
+                      <p className="text-xs text-blue-600 font-medium">
+                        Shared by: {receivedItem.sharedBy.email}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -100,8 +112,28 @@ const SharedWithMe: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No photos uploaded yet.</p>
+          <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+              <svg
+                className="w-8 h-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No shared photos
+            </h3>
+            <p className="text-gray-500">
+              When others share photos with you, they'll appear here.
+            </p>
           </div>
         )}
       </div>
