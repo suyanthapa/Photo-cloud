@@ -3,18 +3,35 @@ import authController from "../controller/authController";
 import userValidation from "../Validation/auth";
 import validate from "../Middleware/validation";
 import getUserfromAuthToken from "../Middleware/jwtfromUser";
+import rateLimit from "express-rate-limit";
+import {
+  authLimiter,
+  generalLimiter,
+  otpLimiter,
+} from "../Middleware/rateLimiter";
 
 const authRouter = express.Router();
 
 //Login User
-authRouter.post("/login", validate(userValidation.login), authController.login);
+authRouter.post(
+  "/login",
+  authLimiter,
+  validate(userValidation.login),
+  authController.login
+);
 
 //Login User
-authRouter.post("/", validate(userValidation.login), authController.login);
+authRouter.post(
+  "/",
+  authLimiter,
+  validate(userValidation.login),
+  authController.login
+);
 
 //register user
 authRouter.post(
   "/register",
+  generalLimiter,
   validate(userValidation.register),
   authController.register
 );
@@ -22,12 +39,13 @@ authRouter.post(
 //  verify OTP
 authRouter.post(
   "/verify-otp",
+  authLimiter,
   validate(userValidation.verifyOTP),
   authController.verifyInputOTP
 );
 
 //forgot password --sends otp
-authRouter.post("/forgot-password", authController.forgotPassword);
+authRouter.post("/forgot-password", otpLimiter, authController.forgotPassword);
 
 //reset password
 authRouter.post(
