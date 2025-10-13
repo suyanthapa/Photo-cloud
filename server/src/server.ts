@@ -6,28 +6,12 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
 import sharedRouter from "./routes/share";
+import { setupSecurity } from "./config/security";
 
 dotenv.config();
 const server = express();
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://photo-cloud-delta.vercel.app",
-];
-
-server.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin like mobile apps or Postman
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+setupSecurity(server);
 
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
