@@ -28,8 +28,6 @@ function App() {
           <Route path="/sent-email" element={<SentEmail />} />
 
           <Route path="/:flow/verify-otp" element={<OtpVerification />} />
-
-          <Route path="/verify-email" element={<SentEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/:flow/reset-password" element={<ResetPassword />} />
           {/* <Route path="/verify-email" element={<VerifyOTP />} /> */}

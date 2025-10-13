@@ -30,9 +30,17 @@ export const createAndSendOTP = async function (
   const hashedToken = await bcrypt.hash(token, 10);
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); //10minutes
 
-  //save OTP in Database
-  await prisma.emailVerification.create({
-    data: {
+  //Use upsert to handle the unique constraint - update if exists, create if not
+  await prisma.emailVerification.upsert({
+    where: { email },
+    update: {
+      otp: hashedToken,
+      expiresAt,
+      used: false,
+      userId: userId || null,
+      createdAt: new Date(), // Reset created time for new OTP
+    },
+    create: {
       email,
       otp: hashedToken,
       expiresAt,
@@ -57,13 +65,25 @@ export const verifyOTP = async (
   email: string,
   otp: string
 ): Promise<VerifyOTPResult> => {
-  const otpDoc = await prisma.emailVerification.findFirst({
-    where: { email, used: false },
-    orderBy: { createdAt: "desc" },
+  const otpDoc = await prisma.emailVerification.findUnique({
+    where: { email },
   });
 
   if (!otpDoc || !otpDoc.otp) {
     return { valid: false, message: "OTP not found" };
+  }
+
+  // Check if OTP is already used
+  if (otpDoc.used) {
+    return { valid: false, message: "OTP already used" };
+  }
+
+  // Check if OTP is expired
+  if (otpDoc.expiresAt < new Date()) {
+    return {
+      valid: false,
+      message: "OTP expired",
+    };
   }
 
   // ensure OTP is string
@@ -73,23 +93,13 @@ export const verifyOTP = async (
   const isValid = await bcrypt.compare(otpToCompare, hash);
   if (!isValid) return { valid: false, message: "Invalid OTP" };
 
-  if (otpDoc.expiresAt < new Date()) {
-    return {
-      valid: false,
-      message: "OTP expired",
-    };
-  }
-
   //mark otp as used
   await prisma.emailVerification.update({
     where: {
-      id: otpDoc.id,
+      email: email,
     },
     data: { used: true },
   });
-
-  // delete all previous OTPs
-  await prisma.emailVerification.deleteMany({ where: { email, used: false } });
 
   return { valid: true, userId: otpDoc.userId! };
 };

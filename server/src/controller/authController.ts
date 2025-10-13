@@ -8,7 +8,7 @@ import { createAndSendOTP, verifyOTP } from "../services/otpService";
 import { createUser, markUserVerified } from "../services/userService";
 import IRequest from "../Middleware/IRequest";
 const client = new PrismaClient();
-dotenv.config(); // Load .env varia
+dotenv.config(); // Load .env variables
 
 //regiser
 const register = async (req: Request, res: Response): Promise<void> => {
@@ -317,12 +317,10 @@ const me = async (req: IRequest, res: Response): Promise<void> => {
     //extracct name , email, isEmailVerified
     const { id, username, email, isEmailVerified, createdAt } = user;
 
-    res
-      .status(200)
-      .json({
-        message: "Profile shown successfully",
-        user: { id, username, email, isEmailVerified, createdAt },
-      });
+    res.status(200).json({
+      message: "Profile shown successfully",
+      user: { id, username, email, isEmailVerified, createdAt },
+    });
   } catch (e: unknown) {
     console.error("profile view error:", e);
     if (e instanceof Error) {

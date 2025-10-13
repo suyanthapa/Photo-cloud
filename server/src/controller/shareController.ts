@@ -11,7 +11,7 @@ const sharePhoto = async (req: IRequest, res: Response): Promise<void> => {
     const receiverUser = await client.user.findUnique({
       where: { email: receiverEmail },
     });
-    
+
     if (!receiverUser) {
       res.status(400).json({ error: "User does not exist" });
       return;
@@ -21,37 +21,35 @@ const sharePhoto = async (req: IRequest, res: Response): Promise<void> => {
       res.status(400).json({ error: "Cannot share photo with yourself" });
       return;
     }
-    
+
     const photo = await client.uploadData.findUnique({
       where: { id: photoId },
       select: {
         id: true,
-        userId: true
-       
+        userId: true,
       },
     });
 
     if (!photo || photo.userId !== Number(userId)) {
-      res.status(403).json({ error: "You do not own this photo or it doesn't exist" });
+      res
+        .status(403)
+        .json({ error: "You do not own this photo or it doesn't exist" });
       return;
     }
 
     const alreadyShared = await client.photoShare.findFirst({
-      where: 
-        {  
-          photoId,
-          sharedWith: receiverEmail,
-
-         },
+      where: {
+        photoId,
+        sharedWith: receiverEmail,
+      },
     });
 
-    if(alreadyShared){
-        res.status(400).json({ error: "Photo already shared with this email" });
+    if (alreadyShared) {
+      res.status(400).json({ error: "Photo already shared with this email" });
       return;
     }
 
-    
-       // Save share record
+    // Save share record
     await client.photoShare.create({
       data: {
         photoId,
@@ -69,8 +67,10 @@ const sharePhoto = async (req: IRequest, res: Response): Promise<void> => {
   }
 };
 
-
-const viewSharedPhotos = async (req: IRequest, res: Response): Promise<void> => {
+const viewSharedPhotos = async (
+  req: IRequest,
+  res: Response
+): Promise<void> => {
   try {
     const loggedInUserId = Number(req.userId);
 
@@ -79,35 +79,32 @@ const viewSharedPhotos = async (req: IRequest, res: Response): Promise<void> => 
       where: {
         sharedById: loggedInUserId,
       },
-      include :{ //Include related photo data for each shared entry
+      include: {
+        //Include related photo data for each shared entry
         photo: {
-          select :{
+          select: {
             id: true,
             photo: true,
-            description : true
+            description: true,
           },
         },
       },
     });
 
     //format the result for frontend display
-    const formatted = shares.map(share => ({
-
+    const formatted = shares.map((share) => ({
       sharedAt: share.sharedAt,
       sharedWith: share.sharedWith,
       photo: {
         id: share.photo.id,
         photo: share.photo.photo,
-        discription: share.photo.description
-      }
-    }))
-   
-
+        discription: share.photo.description,
+      },
+    }));
 
     res.status(200).json({
-        message: "Your shared photos",
-        data: formatted,
-     
+      message: "Your shared photos",
+      data: formatted,
     });
   } catch (e: unknown) {
     console.error("ViewSharedPhotos error:", e);
@@ -117,15 +114,14 @@ const viewSharedPhotos = async (req: IRequest, res: Response): Promise<void> => 
   }
 };
 
-
-
 const sharedToMe = async (req: IRequest, res: Response): Promise<void> => {
   try {
     const loggedInUserId = Number(req.userId);
 
-     // Step 1: Get current user's email
+    // First get current user's email in a single optimized query
     const currentUser = await client.user.findUnique({
       where: { id: loggedInUserId },
+      select: { email: true },
     });
 
     if (!currentUser) {
@@ -133,41 +129,48 @@ const sharedToMe = async (req: IRequest, res: Response): Promise<void> => {
       return;
     }
 
+    // Optimized: Single query with all required includes to avoid N+1
     const sharedPhotos = await client.photoShare.findMany({
-      where : 
-      {
-        sharedWith : currentUser.email
+      where: {
+        sharedWith: currentUser.email,
       },
       include: {
-        photo : {
-          select : {
-            id : true,
+        photo: {
+          select: {
+            id: true,
             description: true,
             photo: true,
             createdAt: true,
-            user : {
-              select : {
-                 id: true,
-                  username: true,
-                  email : true
+            user: {
+              select: {
+                id: true,
+                username: true,
+                email: true,
               },
             },
           },
         },
+        sharedBy: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
       },
-    })
-
+    });
 
     const formatted = sharedPhotos.map((entry) => ({
-      sharedAt : entry.sharedAt,
+      sharedAt: entry.sharedAt,
       sharedBy: entry.photo.user,
       photo: {
         id: entry.photo.id,
-         photo: entry.photo.photo,
-        description: entry.photo.description,   
+        photo: entry.photo.photo,
+        description: entry.photo.description,
         createdAt: entry.photo.createdAt,
-      }
-    }))
+      },
+    }));
+
     res.status(200).json({
       message: "Photos shared with you",
       data: formatted,
@@ -180,10 +183,10 @@ const sharedToMe = async (req: IRequest, res: Response): Promise<void> => {
   }
 };
 
- const shareController = {
-    sharePhoto,
-    viewSharedPhotos,
-    sharedToMe
-}
-        
+const shareController = {
+  sharePhoto,
+  viewSharedPhotos,
+  sharedToMe,
+};
+
 export default shareController;

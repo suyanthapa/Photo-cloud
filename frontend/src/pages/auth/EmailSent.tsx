@@ -29,7 +29,7 @@ const SentEmail: React.FC = () => {
 
       {/* Enter code manually */}
       <button
-        onClick={() => navigate("/verify-email", { state: { email } })}
+        onClick={() => navigate("/register/verify-otp", { state: { email } })}
         className="w-full max-w-xs bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700 transition"
       >
         Enter code manually
