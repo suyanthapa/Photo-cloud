@@ -1,7 +1,7 @@
-import { Request} from "express";
+import { Request } from "express";
 
-interface IRequest extends Request{
-    userId?: string;
+interface IRequest extends Request {
+  userId?: string;
 }
 
 export default IRequest;
