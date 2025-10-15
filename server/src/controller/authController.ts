@@ -43,6 +43,8 @@ const register = asyncHandler(
     const user = await client.user.create({
       data: { email, username, password: hashedPassword },
     });
+    console.log("Email is", email);
+    console.log("ID:", user.id);
 
     //send  verify otp
     await createAndSendOTP(email, "verify", user.id);

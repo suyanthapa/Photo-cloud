@@ -28,6 +28,7 @@ export const createAndSendOTP = async function (
   userId?: number
 ) {
   try {
+    console.log("Generating OTP for:", email, "Type:", type, "UserID:", userId);
     const token = generateToken();
     const hashedToken = await bcrypt.hash(token, 10);
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); //10minutes

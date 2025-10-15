@@ -37,7 +37,7 @@ model PhotoShare {
   photo   uploadData @relation("PhotoShares", fields: [photoId], references: [id], onDelete: Cascade)
   photoId Int
 
-  sharedBy   User @relation("SharedBy", fields: [sharedById], references: [id])
+  sharedBy   User @relation("SharedBy", fields: [sharedById], references: [id], onDelete: Cascade)
   sharedById Int
 
   sharedWith String
@@ -52,6 +52,6 @@ model EmailVerification {
   createdAt DateTime @default(now())
   used      Boolean  @default(false)
 
-  user   User? @relation(fields: [userId], references: [id])
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int?
 }
