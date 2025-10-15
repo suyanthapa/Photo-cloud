@@ -2,7 +2,7 @@ import express from "express";
 
 import userValidation from "../Validation/auth";
 import validate from "../Middleware/validation";
-import upload from "../Middleware/multerConfig";
+import upload from "../config/multerConfig";
 import uploadController from "../controller/uploadController";
 import getUserfromAuthToken from "../Middleware/jwtfromUser";
 

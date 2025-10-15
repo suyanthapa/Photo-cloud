@@ -12,7 +12,7 @@ export const otpLimiter = rateLimit({
 
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 login attempts
+  max: 20, // 20 login attempts
   message: {
     message: "Too many authentication attempts, try again later",
   },

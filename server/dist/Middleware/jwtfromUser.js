@@ -17,14 +17,8 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const getUserfromAuthToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //  let token = req.headers['authorization']?.replace('Bearer ', '');
         let token = req.cookies.uid;
         console.log("token", token);
-        if (!token) {
-            const authHeader = req.headers["authorization"];
-            token = authHeader === null || authHeader === void 0 ? void 0 : authHeader.replace("Bearer ", "");
-            //   token = req.headers['authorization']?.replace('Bearer ', '');
-        }
         if (!token) {
             res.status(401).json({ message: "No token provided" });
             return;

@@ -6,5 +6,10 @@ export const fetchImages = async (page: number, limit: number) => {
     `${apiBaseUrl}/api/data/images?page=${page}&limit=${limit}`,
     { withCredentials: true }
   );
-  return res.data;
+
+  if (res.data.success) {
+    return res.data.data; // Return the actual data object with images, currentPage, totalPages
+  } else {
+    throw new Error(res.data.message || "Failed to fetch images");
+  }
 };

@@ -7,6 +7,8 @@ import cors from "cors";
 import path from "path";
 import sharedRouter from "./routes/share";
 import { setupSecurity } from "./config/security";
+import { errorHandler, notFoundHandler } from "./Middleware/errorHandler";
+import { error } from "console";
 
 dotenv.config();
 const server = express();
@@ -26,6 +28,8 @@ server.use("/api/auth", authRouter);
 server.use("/api/data", uploadRouter);
 server.use("/api/data/share", sharedRouter);
 
+server.use(notFoundHandler);
+server.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {

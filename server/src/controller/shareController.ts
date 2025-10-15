@@ -1,10 +1,18 @@
 import { PrismaClient } from "@prisma/client";
 import IRequest from "../Middleware/IRequest";
 import { Request, Response } from "express";
+import { asyncHandler } from "../utils/asyncHandler";
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+  ConflictError,
+} from "../utils/errors";
+import { sendSuccess } from "../utils/response";
 const client = new PrismaClient();
 
-const sharePhoto = async (req: IRequest, res: Response): Promise<void> => {
-  try {
+const sharePhoto = asyncHandler(
+  async (req: IRequest, res: Response): Promise<void> => {
     const userId = req.userId;
     const { receiverEmail, photoId } = req.body;
 
@@ -13,13 +21,11 @@ const sharePhoto = async (req: IRequest, res: Response): Promise<void> => {
     });
 
     if (!receiverUser) {
-      res.status(400).json({ error: "User does not exist" });
-      return;
+      throw new NotFoundError("User does not exist");
     }
 
     if (receiverUser.id === Number(userId)) {
-      res.status(400).json({ error: "Cannot share photo with yourself" });
-      return;
+      throw new ValidationError("Cannot share photo with yourself");
     }
 
     const photo = await client.uploadData.findUnique({
@@ -31,10 +37,9 @@ const sharePhoto = async (req: IRequest, res: Response): Promise<void> => {
     });
 
     if (!photo || photo.userId !== Number(userId)) {
-      res
-        .status(403)
-        .json({ error: "You do not own this photo or it doesn't exist" });
-      return;
+      throw new UnauthorizedError(
+        "You do not own this photo or it doesn't exist"
+      );
     }
 
     const alreadyShared = await client.photoShare.findFirst({
@@ -45,8 +50,7 @@ const sharePhoto = async (req: IRequest, res: Response): Promise<void> => {
     });
 
     if (alreadyShared) {
-      res.status(400).json({ error: "Photo already shared with this email" });
-      return;
+      throw new ConflictError("Photo already shared with this email");
     }
 
     // Save share record
@@ -58,20 +62,12 @@ const sharePhoto = async (req: IRequest, res: Response): Promise<void> => {
       },
     });
 
-    res.status(200).json({ message: "Photo shared successfully" });
-  } catch (e: unknown) {
-    console.error("Share error:", e);
-    res.status(500).json({
-      message: e instanceof Error ? e.message : "An unknown error occurred",
-    });
+    sendSuccess(res, null, "Photo shared successfully");
   }
-};
+);
 
-const viewSharedPhotos = async (
-  req: IRequest,
-  res: Response
-): Promise<void> => {
-  try {
+const viewSharedPhotos = asyncHandler(
+  async (req: IRequest, res: Response): Promise<void> => {
     const loggedInUserId = Number(req.userId);
 
     //Find all PhotoShare records where the current user shared the photo
@@ -102,20 +98,12 @@ const viewSharedPhotos = async (
       },
     }));
 
-    res.status(200).json({
-      message: "Your shared photos",
-      data: formatted,
-    });
-  } catch (e: unknown) {
-    console.error("ViewSharedPhotos error:", e);
-    res.status(500).json({
-      message: e instanceof Error ? e.message : "An unknown error occurred",
-    });
+    sendSuccess(res, formatted, "Your shared photos");
   }
-};
+);
 
-const sharedToMe = async (req: IRequest, res: Response): Promise<void> => {
-  try {
+const sharedToMe = asyncHandler(
+  async (req: IRequest, res: Response): Promise<void> => {
     const loggedInUserId = Number(req.userId);
 
     // First get current user's email in a single optimized query
@@ -125,8 +113,7 @@ const sharedToMe = async (req: IRequest, res: Response): Promise<void> => {
     });
 
     if (!currentUser) {
-      res.status(400).json({ error: "User not found" });
-      return;
+      throw new NotFoundError("User not found");
     }
 
     // Optimized: Single query with all required includes to avoid N+1
@@ -171,17 +158,9 @@ const sharedToMe = async (req: IRequest, res: Response): Promise<void> => {
       },
     }));
 
-    res.status(200).json({
-      message: "Photos shared with you",
-      data: formatted,
-    });
-  } catch (e: unknown) {
-    console.error("SharedToMe error:", e);
-    res.status(500).json({
-      message: e instanceof Error ? e.message : "An unknown error occurred",
-    });
+    sendSuccess(res, formatted, "Photos shared with you");
   }
-};
+);
 
 const shareController = {
   sharePhoto,

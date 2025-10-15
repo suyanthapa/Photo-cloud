@@ -10,218 +10,185 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
+const cloudinary_1 = require("../utils/cloudinary");
+const cloudinaryHelper_1 = require("../utils/cloudinaryHelper");
+const asyncHandler_1 = require("../utils/asyncHandler");
+const errors_1 = require("../utils/errors");
+const response_1 = require("../utils/response");
 const client = new client_1.PrismaClient();
-const uploadData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    try {
-        const userId = req.userId;
-        // Access the file from req.files, not req.body
-        const photo = (_b = (_a = req.files) === null || _a === void 0 ? void 0 : _a.photo) === null || _b === void 0 ? void 0 : _b[0];
-        const { description } = req.body;
-        console.log("body is", req.body);
-        console.log("The file is", photo);
-        console.log("The description is ", description);
-        console.log("The USERiD is", userId);
-        if (!photo) {
-            res.status(400).json({ message: "No file uploaded." });
-            return;
-        }
-        if (!description || !userId) {
-            res.status(400).json({ message: "Missing description or userId." });
-            return;
-        }
-        const upload = yield client.uploadData.create({
-            data: {
-                photo: photo.filename,
-                description,
-                userId: Number(userId)
-            }
-        });
-        res.status(201).json({
-            message: "Uploaded Sucessfully",
-            data: upload
-        });
-        return;
+const uploadData = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.userId;
+    const photo = req.file;
+    if (!photo) {
+        throw new errors_1.ValidationError("No file uploaded.");
     }
-    catch (e) {
-        console.error("Upload error:", e);
-        if (e instanceof Error) {
-            res.status(500).json({ message: e.message });
-        }
-        else {
-            res.status(500).json({ message: "An unknown error occurred" });
-        }
+    if (!userId) {
+        throw new errors_1.UnauthorizedError("User ID missing.");
     }
-});
-const viewUploadedData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const userId = req.userId;
-        const existingUser = yield client.user.findUnique({
-            where: {
-                id: Number(userId)
+    const photoUrl = photo.path; // photo.path is full Cloudinary URL
+    const { description } = req.body;
+    if (!description) {
+        throw new errors_1.ValidationError("No description provided.");
+    }
+    const upload = yield client.uploadData.create({
+        data: {
+            photo: photoUrl, // Cloudinary gives you a full URL here
+            description,
+            userId: Number(userId),
+        },
+    });
+    (0, response_1.sendSuccess)(res, upload, "Uploaded Successfully");
+}));
+const viewUploadedData = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.userId;
+    const existingUser = yield client.user.findUnique({
+        where: {
+            id: Number(userId),
+        },
+    });
+    if (!existingUser) {
+        throw new errors_1.UnauthorizedError("User not found");
+    }
+    const data = yield client.uploadData.findMany({
+        where: {
+            userId: Number(userId),
+        },
+    });
+    (0, response_1.sendSuccess)(res, data, "Data fetched successfully");
+}));
+const viewSingleData = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.userId;
+    const { id } = req.params; //  Get data ID from URL
+    const existingUser = yield client.user.findUnique({
+        where: {
+            id: Number(userId),
+        },
+    });
+    if (!existingUser) {
+        throw new errors_1.UnauthorizedError("User not found");
+    }
+    const data = yield client.uploadData.findFirst({
+        where: {
+            id: Number(id),
+        },
+        include: {
+            user: {
+                select: {
+                    email: true,
+                },
             },
-        });
-        if (!existingUser) {
-            res.status(400).json({ error: "User doesnot exist" });
-            return;
-        }
-        const data = yield client.uploadData.findMany({
-            where: {
-                userId: Number(userId)
-            }
-        });
-        console.log("The uploaded data is:", data);
-        res.status(201).json({
-            data
-        });
-        return;
+        },
+    });
+    if ((data === null || data === void 0 ? void 0 : data.id) !== Number(id)) {
+        throw new errors_1.NotFoundError("Not found any data");
     }
-    catch (e) {
-        console.error("View Uploaded Data Error:", e);
-        if (e instanceof Error) {
-            res.status(500).json({ message: e.message });
-        }
-        else {
-            res.status(500).json({ message: "An unknown erro occured" });
-        }
+    (0, response_1.sendSuccess)(res, data, "Data fetched successfully");
+}));
+const editData = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.userId; //logged in user
+    const { uploadedId, description } = req.body;
+    const existingUser = yield client.user.findUnique({
+        where: {
+            id: Number(userId),
+        },
+    });
+    //CHECK USER EXISTS OR NOT
+    if (!existingUser) {
+        throw new errors_1.UnauthorizedError("User not found");
     }
-});
-const viewSingleData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const userId = req.userId;
-        const { id } = req.params; //  Get data ID from URL
-        const existingUser = yield client.user.findUnique({
-            where: {
-                id: Number(userId)
-            },
-        });
-        if (!existingUser) {
-            res.status(400).json({ error: "User doesnot exist" });
-            return;
-        }
-        const data = yield client.uploadData.findFirst({
-            where: {
-                id: Number(id)
-            },
-            include: {
-                user: {
-                    select: {
-                        email: true
-                    }
-                }
-            }
-        });
-        if ((data === null || data === void 0 ? void 0 : data.id) !== Number(id)) {
-            res.status(400).json({
-                error: "Not found any data"
-            });
-        }
-        console.log("The uploaded data is:", data);
-        res.status(201).json({
-            data
-        });
-        return;
+    //CHECK WHETHERE THE UPLOADED USER IS SAME OR NOT
+    const verifyUser = yield client.uploadData.findFirst({
+        where: {
+            userId: Number(userId),
+            id: uploadedId,
+        },
+    });
+    if (!verifyUser) {
+        throw new errors_1.NotFoundError("No data found with this document ID");
     }
-    catch (e) {
-        console.error("View Uploaded Data Error:", e);
-        if (e instanceof Error) {
-            res.status(500).json({ message: e.message });
-        }
-        else {
-            res.status(500).json({ message: "An unknown erro occured" });
-        }
-    }
-});
-const editData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const userId = req.userId; //logged in user
-        const { uploadedId, description } = req.body;
-        const existingUser = yield client.user.findUnique({
-            where: {
-                id: Number(userId)
-            },
-        });
-        //CHECK USER EXISTS OR NOT
-        if (!existingUser) {
-            res.status(400).json({ error: "User doesnot exist" });
-            return;
-        }
-        //CHECK WHETHERE THE UPLOADED USER IS SAME OR NOT
-        const verifyUser = yield client.uploadData.findFirst({
-            where: {
-                userId: Number(userId),
-                id: uploadedId
-            }
-        });
-        if (!verifyUser) {
-            res.status(404).json({ error: "not found any data with this document id" });
-            return;
-        }
-        //update data
-        const updatedData = yield client.uploadData.update({
-            where: {
-                id: uploadedId
-            },
-            data: {
-                description: description
-            }
-        });
-        console.log("The updated data is", updatedData);
-        res.status(200).json({
-            message: "Updated Successfully",
-            data: updatedData,
-        });
-        return;
-    }
-    catch (e) {
-        console.error("View Uploaded Data Error:", e);
-        if (e instanceof Error) {
-            res.status(500).json({ message: e.message });
-        }
-        else {
-            res.status(500).json({ message: "An unknown erro occured" });
-        }
-    }
-});
+    //update data
+    const updatedData = yield client.uploadData.update({
+        where: {
+            id: uploadedId,
+        },
+        data: {
+            description: description,
+        },
+    });
+    (0, response_1.sendSuccess)(res, updatedData, "Updated Successfully");
+}));
 //DELETE DATA
-const deleteData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const userId = req.userId;
-        const { uploadedId } = req.body;
-        console.log("Received uploadedId:", uploadedId);
-        // Verify that the photo belongs to the logged-in user
-        const verifyUser = yield client.uploadData.findFirst({
+const deleteData = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.userId;
+    const { uploadedId } = req.body;
+    console.log("Received uploadedId:", uploadedId);
+    // Verify that the photo belongs to the logged-in user
+    const verifyUser = yield client.uploadData.findFirst({
+        where: {
+            userId: Number(userId),
+            id: uploadedId,
+        },
+    });
+    if (!verifyUser) {
+        throw new errors_1.NotFoundError("No data found with this document ID");
+    }
+    //  Extract public_id from the photo URL
+    const photoUrl = verifyUser.photo;
+    const publicId = (0, cloudinaryHelper_1.extractPublicIdFromUrl)(photoUrl);
+    //Transaction
+    yield client.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        //delete from cloudinary
+        if (publicId) {
+            yield cloudinary_1.cloudinary.uploader.destroy(publicId);
+        }
+        // delete from database
+        yield tx.uploadData.delete({
+            where: {
+                id: Number(uploadedId),
+            },
+        });
+    }));
+    (0, response_1.sendSuccess)(res, { documentId: uploadedId }, "Deleted Successfully from Cloudinary and database");
+}));
+const getImagesUsingPagination = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const userId = req.userId;
+    const existingUser = yield client.user.findUnique({
+        where: {
+            id: Number(userId),
+        },
+    });
+    if (!existingUser) {
+        throw new errors_1.UnauthorizedError("User does not exist");
+    }
+    const [images, total] = yield Promise.all([
+        client.uploadData.findMany({
             where: {
                 userId: Number(userId),
-                id: uploadedId,
             },
-        });
-        if (!verifyUser) {
-            res.status(404).json({ error: "No data found with this document ID" });
-            return;
-        }
-        const deleted = yield client.uploadData.delete({
+            skip: (page - 1) * limit,
+            take: limit,
+            orderBy: { createdAt: "desc" },
+        }),
+        client.uploadData.count({
             where: {
-                id: uploadedId,
+                userId: Number(userId),
             },
-        });
-        res.status(200).json({
-            message: "Deleted Successfully",
-            documentId: uploadedId,
-        });
-    }
-    catch (e) {
-        console.error("Delete Data Error:", e);
-        res.status(500).json({
-            message: e instanceof Error ? e.message : "An unknown error occurred",
-        });
-    }
-});
+        }),
+    ]);
+    (0, response_1.sendSuccess)(res, {
+        images,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+    }, "Images fetched successfully");
+}));
 const uploadController = {
     uploadData,
     viewUploadedData,
     viewSingleData,
     editData,
-    deleteData
+    deleteData,
+    getImagesUsingPagination,
 };
 exports.default = uploadController;

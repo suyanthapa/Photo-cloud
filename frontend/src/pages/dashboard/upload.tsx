@@ -96,13 +96,12 @@ const UploadPage: React.FC = () => {
 
   const fetchUploads = async () => {
     try {
-      const res = await axios.get<{ data: UploadedData[] }>(
-        `${apiBaseUrl}/api/data/viewData`,
-        {
-          withCredentials: true,
-        }
-      );
-      setUploads(res.data.data);
+      const res = await axios.get(`${apiBaseUrl}/api/data/viewData`, {
+        withCredentials: true,
+      });
+      if (res.data.success) {
+        setUploads(res.data.data);
+      }
     } catch (error) {
       console.error("Failed to fetch uploads", error);
     }

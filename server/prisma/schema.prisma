@@ -27,7 +27,7 @@ model uploadData {
   createdAt   DateTime @default(now())
 
   userId Int
-  user   User @relation("OwnerUploads", fields: [userId], references: [id])
+  user   User @relation("OwnerUploads", fields: [userId], references: [id], onDelete: Cascade)
 
   shares PhotoShare[] @relation("PhotoShares")
 }

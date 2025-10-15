@@ -5,21 +5,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userUpload = void 0;
 const express_1 = __importDefault(require("express"));
-const multerConfig_1 = __importDefault(require("../Middleware/multerConfig"));
+const multerConfig_1 = __importDefault(require("../config/multerConfig"));
 const uploadController_1 = __importDefault(require("../controller/uploadController"));
 const jwtfromUser_1 = __importDefault(require("../Middleware/jwtfromUser"));
 const uploadRouter = express_1.default.Router();
-exports.userUpload = multerConfig_1.default.fields([
-    { name: 'photo', maxCount: 1 }
-]);
+exports.userUpload = multerConfig_1.default.single("photo");
 //Upload  User Photo
-uploadRouter.post('/upload', exports.userUpload, jwtfromUser_1.default, uploadController_1.default.uploadData);
+uploadRouter.post("/upload", exports.userUpload, jwtfromUser_1.default, uploadController_1.default.uploadData);
 //view uploaded data
-uploadRouter.get('/viewData', jwtfromUser_1.default, uploadController_1.default.viewUploadedData);
+uploadRouter.get("/viewData", jwtfromUser_1.default, uploadController_1.default.viewUploadedData);
 //view uploaded single data
-uploadRouter.get('/viewSingleData/:id', jwtfromUser_1.default, uploadController_1.default.viewSingleData);
+uploadRouter.get("/viewSingleData/:id", jwtfromUser_1.default, uploadController_1.default.viewSingleData);
 //edit uploaded data
-uploadRouter.put('/editData', jwtfromUser_1.default, uploadController_1.default.editData);
+uploadRouter.put("/editData", jwtfromUser_1.default, uploadController_1.default.editData);
 //delete uploaded data
-uploadRouter.delete('/deleteData', jwtfromUser_1.default, uploadController_1.default.deleteData);
+uploadRouter.delete("/deleteData", jwtfromUser_1.default, uploadController_1.default.deleteData);
+//view  uploaded data using pagination
+uploadRouter.get("/images", jwtfromUser_1.default, uploadController_1.default.getImagesUsingPagination);
+uploadRouter.post("/stats", exports.userUpload, jwtfromUser_1.default, uploadController_1.default.uploadData);
 exports.default = uploadRouter;

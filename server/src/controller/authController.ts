@@ -7,20 +7,35 @@ import { findUserByEmail } from "../utils/userHelper";
 import { createAndSendOTP, verifyOTP } from "../services/otpService";
 import { createUser, markUserVerified } from "../services/userService";
 import IRequest from "../Middleware/IRequest";
+import { asyncHandler } from "../utils/asyncHandler";
+import {
+  AppError,
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from "../utils/errors";
+import { sendSuccess } from "../utils/response";
+import { send } from "process";
 const client = new PrismaClient();
 dotenv.config(); // Load .env variables
 
 //regiser
-const register = async (req: Request, res: Response): Promise<void> => {
-  try {
+const register = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const { email, username, password } = req.body;
 
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
-      res.status(400).json({ error: "User already exists" });
-      return;
+      throw new ConflictError("User already exists");
     }
 
+    const uniqueUsername = await client.user.findUnique({
+      where: { username },
+    });
+    if (uniqueUsername) {
+      throw new ConflictError("Username already taken");
+    }
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
     console.log("Hashed pw is", hashedPassword);
@@ -32,29 +47,29 @@ const register = async (req: Request, res: Response): Promise<void> => {
     //send  verify otp
     await createAndSendOTP(email, "verify", user.id);
 
-    res.status(200).json({
-      user,
-      message: "User Created and Mail sent successfully",
-    });
-  } catch (e: unknown) {
-    console.error("Register error:", e);
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-    } else {
-      res.status(500).json({ message: "An unknown error occurred" });
-    }
+    sendSuccess(
+      res,
+      {
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+        },
+      },
+      "User Created and Mail sent successfully",
+      201
+    );
   }
-};
+);
 
 //login
-const login = async (req: Request, res: Response): Promise<void> => {
-  try {
+const login = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     const existingUser = await findUserByEmail(email);
     if (!existingUser) {
-      res.status(400).json({ error: "User doesnot exist" });
-      return;
+      throw new NotFoundError("User");
     }
 
     // Compare password with hashed password
@@ -63,17 +78,13 @@ const login = async (req: Request, res: Response): Promise<void> => {
       existingUser.password
     );
     if (!isPasswordValid) {
-      res.status(401).json({ message: "Invalid Login Credentials" });
-      return;
+      throw new UnauthorizedError("Invalid Login Credentials");
     }
 
     if (existingUser.isEmailVerified === false) {
       //send  verify otp
       await createAndSendOTP(email, "verify", existingUser.id);
-      res.status(403).json({
-        message: "Email not verified. Verification OTP sent to your email.",
-      });
-      return;
+      throw new AppError("Please verify your email. OTP sent again.", 400);
     }
 
     //generate token
@@ -91,39 +102,40 @@ const login = async (req: Request, res: Response): Promise<void> => {
       httpOnly: true,
       secure: true, // true on https only
       sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    res.status(200).json({
-      token: token,
-      message: "User Logged In ",
-    });
-  } catch (e: unknown) {
-    console.error("Login error:", e);
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-    } else {
-      res.status(500).json({ message: "An unknown error occurred" });
-    }
+    sendSuccess(
+      res,
+      {
+        token,
+        user: {
+          id: existingUser.id,
+          username: existingUser.username,
+          email: existingUser.email,
+        },
+      },
+      "Logged in successfully",
+      200
+    );
   }
-};
+);
 
 //verify email from  OTP
-const verifyInputOTP = async (req: Request, res: Response): Promise<void> => {
-  try {
+const verifyInputOTP = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const { email, otp } = req.body;
 
     const result = await verifyOTP(email, otp);
 
     if (!result.valid) {
-      res.status(400).json({ message: result.message });
-      return;
+      throw new ValidationError(result.message || "Invalid verification code");
     }
 
     // Mark user as verified
     const user = await findUserByEmail(email);
     if (!user) {
-      res.status(400).json({ error: "User doesnot exist" });
-      return;
+      throw new NotFoundError("User");
     }
     if (user.isEmailVerified === false) {
       await markUserVerified(email);
@@ -132,28 +144,20 @@ const verifyInputOTP = async (req: Request, res: Response): Promise<void> => {
     await client.emailVerification.deleteMany({
       where: { email },
     });
-    res.status(200).json({
-      message: "OTP verified successfully",
-    });
-    return;
-  } catch (error) {
-    console.error("Verify Email Error:", error);
-    res.status(500).json({ message: "Server error" });
-    return;
+    sendSuccess(res, null, "Email verified successfully");
   }
-};
+);
 
 //for forgot password otp verification
 const verifyForgotPasswordOtp = verifyInputOTP;
 
-const forgotPassword = async (req: Request, res: Response): Promise<void> => {
-  try {
+const forgotPassword = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const { email } = req.body;
 
     const user = await findUserByEmail(email);
     if (!user) {
-      res.status(400).json({ error: "User doesnot exist" });
-      return;
+      throw new NotFoundError("User");
     }
 
     // check if OTP already exists for this email & delete it
@@ -169,41 +173,22 @@ const forgotPassword = async (req: Request, res: Response): Promise<void> => {
     //create and send otp
     await createAndSendOTP(email, "forgot", user.id);
 
-    res.status(200).json({
-      details: [
-        {
-          message: "Otp Sent Successfully",
-          user,
-        },
-      ],
-    });
-    return;
-  } catch (e: unknown) {
-    console.error("Send OTP error:", e);
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-      return;
-    } else {
-      res.status(500).json({ message: "An unknown error occurred" });
-      return;
-    }
+    sendSuccess(res, null, "Otp Sent Successfully");
   }
-};
+);
 
 // Reset Password ( changepassword )
-const resetPassword = async (req: Request, res: Response): Promise<void> => {
-  try {
+const resetPassword = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const { email, password, confirmPassword } = req.body;
 
     const existingUser = await findUserByEmail(email);
     if (!existingUser) {
-      res.status(400).json({ error: "User doesnot exist" });
-      return;
+      throw new NotFoundError("User");
     }
 
     if (password != confirmPassword) {
-      res.status(401).json({ message: "Password don't match" });
-      return;
+      throw new ValidationError("Password don't match");
     }
 
     //  Hash password
@@ -216,51 +201,35 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
       },
     });
 
-    res.status(200).json({ message: "Password reset successfully" });
-  } catch (e: unknown) {
-    console.error("Login error:", e);
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-    } else {
-      res.status(500).json({ message: "An unknown error occurred" });
-    }
+    sendSuccess(res, null, "Password reset successfully");
   }
-};
+);
 
 //logout
-const logout = async (req: Request, res: Response): Promise<void> => {
-  try {
+const logout = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     res.clearCookie("uid", {
       httpOnly: true,
       secure: true,
       sameSite: "none",
     });
-    res.status(200).json({ message: "Logged out successfully" });
-  } catch (e: unknown) {
-    console.error("Login error:", e);
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-    } else {
-      res.status(500).json({ message: "An unknown error occurred" });
-    }
+    sendSuccess(res, null, "Logged out successfully");
   }
-};
+);
 
-const updatePassword = async (req: IRequest, res: Response): Promise<void> => {
-  try {
+const updatePassword = asyncHandler(
+  async (req: IRequest, res: Response): Promise<void> => {
     const userId = Number(req.userId);
 
     const { currentPassword, newPassword, confirmPassword } = req.body;
     if (!userId) {
-      res.status(401).json({ message: "Unauthorized: User ID missing" });
-      return;
+      throw new UnauthorizedError("Unauthorized: User ID missing");
     }
     const user = await client.user.findUnique({
       where: { id: Number(userId) },
     });
     if (!user) {
-      res.status(400).json({ error: "User doesnot exist" });
-      return;
+      throw new NotFoundError("User");
     }
     // Compare current password with hashed password
     const isPasswordValid = await bcrypt.compare(
@@ -268,13 +237,11 @@ const updatePassword = async (req: IRequest, res: Response): Promise<void> => {
       user.password
     );
     if (!isPasswordValid) {
-      res.status(401).json({ message: "Invalid Current Password" });
-      return;
+      throw new UnauthorizedError("Invalid current password");
     }
 
     if (newPassword != confirmPassword) {
-      res.status(401).json({ message: "Password don't match" });
-      return;
+      throw new ValidationError("Password don't match");
     }
 
     //  Hash password
@@ -287,49 +254,32 @@ const updatePassword = async (req: IRequest, res: Response): Promise<void> => {
       },
     });
 
-    res.status(200).json({ message: "Password updated successfully" });
-  } catch (e: unknown) {
-    console.error("Login error:", e);
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-    } else {
-      res.status(500).json({ message: "An unknown error occurred" });
-    }
+    sendSuccess(res, null, "Password updated successfully");
   }
-};
+);
 
-const me = async (req: IRequest, res: Response): Promise<void> => {
-  try {
-    const userId = Number(req.userId);
+const me = asyncHandler(async (req: IRequest, res: Response): Promise<void> => {
+  const userId = Number(req.userId);
 
-    if (!userId) {
-      res.status(401).json({ message: "Unauthorized: User ID missing" });
-      return;
-    }
-    const user = await client.user.findUnique({
-      where: { id: Number(userId) },
-    });
-    if (!user) {
-      res.status(400).json({ error: "User doesnot exist" });
-      return;
-    }
-
-    //extracct name , email, isEmailVerified
-    const { id, username, email, isEmailVerified, createdAt } = user;
-
-    res.status(200).json({
-      message: "Profile shown successfully",
-      user: { id, username, email, isEmailVerified, createdAt },
-    });
-  } catch (e: unknown) {
-    console.error("profile view error:", e);
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-    } else {
-      res.status(500).json({ message: "An unknown error occurred" });
-    }
+  if (!userId) {
+    throw new UnauthorizedError("Unauthorized: User ID missing");
   }
-};
+  const user = await client.user.findUnique({
+    where: { id: Number(userId) },
+  });
+  if (!user) {
+    throw new NotFoundError("User");
+  }
+
+  //extracct name , email, isEmailVerified
+  const { id, username, email, isEmailVerified, createdAt } = user;
+
+  sendSuccess(
+    res,
+    { id, username, email, isEmailVerified, createdAt },
+    "Profile shown successfully"
+  );
+});
 
 const authController = {
   register,

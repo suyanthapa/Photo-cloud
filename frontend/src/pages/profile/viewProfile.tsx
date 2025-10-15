@@ -37,7 +37,9 @@ const ViewProfile: React.FC = () => {
           withCredentials: true,
         });
         console.log("Response from /me:", res.data);
-        setUser(res.data.user);
+        if (res.data.success) {
+          setUser(res.data.data);
+        }
       } catch (err: any) {
         setError(err.response?.data?.message || "Failed to load profile");
       } finally {

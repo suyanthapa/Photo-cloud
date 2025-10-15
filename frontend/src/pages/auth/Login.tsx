@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { Button } from "../../components/ui/button";
 import { Spinner } from "../../components/ui/spinner";
 import AuthHeader from "../../components/AuthHeader";
@@ -30,20 +30,19 @@ const Login: React.FC = () => {
       const res = await axios.post(`${apiBaseUrl}/api/auth/login`, formData, {
         withCredentials: true,
       });
-      setMessage("✅ Login Successfully");
-      console.log(res.data);
-      navigate("/dashboard");
-    } catch (err: any) {
-      const msg =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        "❌ Login Failed";
 
-      setMessage(msg);
-      const status = err.response.status;
+      if (res.data.success) {
+        setMessage("✅ " + res.data.message);
+        console.log("Login successful:", res.data.data);
+        navigate("/dashboard");
+      }
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || "❌ Login Failed";
+      setMessage(errorMessage);
+
+      const status = err.response?.status;
       if (status === 403) {
-        //email not verified
-        setMessage(err.response.data.message || "Email not verified");
+        // Email not verified
         navigate("/sent-email", { state: { email: formData.email } });
       }
     } finally {

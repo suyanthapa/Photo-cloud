@@ -26,15 +26,11 @@ export const setupSecurity = (server: Express) => {
 
   server.use(
     cors({
-      origin: (origin, callback) => {
-        // Allow requests with no origin like mobile apps or Postman
-        if (!origin || allowedOrigins.includes(origin)) {
-          callback(null, true);
-        } else {
-          callback(new Error("Not allowed by CORS"));
-        }
-      },
+      origin: allowedOrigins, // Remove the callback for stricter validation
       credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+      maxAge: 86400, // Cache preflight for 24 hours
     })
   );
 };

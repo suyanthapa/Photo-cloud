@@ -35,7 +35,7 @@ const Register: React.FC = () => {
     try {
       await axios.post(`${apiBaseUrl}/api/auth/register`, {
         email: formData.email,
-        username: formData.email,
+        username: formData.username,
         password: formData.password,
       });
       setMessage("✅ OTP sent! Please check your email.");

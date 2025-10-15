@@ -1,41 +1,38 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import upload from "../Middleware/multerConfig";
+import upload from "../config/multerConfig";
 import IRequest from "../Middleware/IRequest";
 import { promises } from "dns";
 import { cloudinary } from "../utils/cloudinary";
 import { extractPublicIdFromUrl } from "../utils/cloudinaryHelper";
+import { asyncHandler } from "../utils/asyncHandler";
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from "../utils/errors";
+import { sendSuccess } from "../utils/response";
 
 const client = new PrismaClient();
 
-const uploadData = async (req: IRequest, res: Response): Promise<void> => {
-  try {
+const uploadData = asyncHandler(
+  async (req: IRequest, res: Response): Promise<void> => {
     const userId = req.userId;
     const photo = req.file as Express.Multer.File;
 
     if (!photo) {
-      res.status(400).json({ message: "No file uploaded." });
-      return;
+      throw new ValidationError("No file uploaded.");
     }
 
-    // Now TypeScript knows photo is defined
-    const photoUrl = (photo as any).path; // photo.path is full Cloudinary URL
+    if (!userId) {
+      throw new UnauthorizedError("User ID missing.");
+    }
 
+    const photoUrl = (photo as any).path; // photo.path is full Cloudinary URL
     const { description } = req.body;
 
-    console.log("body is", req.body);
-    console.log("The file is", photo);
-    console.log("The description is ", description);
-    console.log("The USERiD is", userId);
-
-    if (!photo) {
-      res.status(400).json({ message: "No file uploaded." });
-      return;
-    }
-
-    if (!description || !userId) {
-      res.status(400).json({ message: "Missing description or userId." });
-      return;
+    if (!description) {
+      throw new ValidationError("No description provided.");
     }
 
     const upload = await client.uploadData.create({
@@ -46,27 +43,12 @@ const uploadData = async (req: IRequest, res: Response): Promise<void> => {
       },
     });
 
-    res.status(201).json({
-      message: "Uploaded Successfully",
-      data: upload,
-    });
-
-    return;
-  } catch (e: unknown) {
-    console.error("Upload error:", e);
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-    } else {
-      res.status(500).json({ message: "An unknown error occurred" });
-    }
+    sendSuccess(res, upload, "Uploaded Successfully");
   }
-};
+);
 
-const viewUploadedData = async (
-  req: IRequest,
-  res: Response
-): Promise<void> => {
-  try {
+const viewUploadedData = asyncHandler(
+  async (req: IRequest, res: Response): Promise<void> => {
     const userId = req.userId;
 
     const existingUser = await client.user.findUnique({
@@ -76,8 +58,7 @@ const viewUploadedData = async (
     });
 
     if (!existingUser) {
-      res.status(400).json({ error: "User doesnot exist" });
-      return;
+      throw new UnauthorizedError("User not found");
     }
 
     const data = await client.uploadData.findMany({
@@ -86,25 +67,12 @@ const viewUploadedData = async (
       },
     });
 
-    console.log("The uploaded data is:", data);
-
-    res.status(201).json({
-      data,
-    });
-    return;
-  } catch (e: unknown) {
-    console.error("View Uploaded Data Error:", e);
-
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-    } else {
-      res.status(500).json({ message: "An unknown erro occured" });
-    }
+    sendSuccess(res, data, "Data fetched successfully");
   }
-};
+);
 
-const viewSingleData = async (req: IRequest, res: Response): Promise<void> => {
-  try {
+const viewSingleData = asyncHandler(
+  async (req: IRequest, res: Response): Promise<void> => {
     const userId = req.userId;
     const { id } = req.params; //  Get data ID from URL
 
@@ -115,8 +83,7 @@ const viewSingleData = async (req: IRequest, res: Response): Promise<void> => {
     });
 
     if (!existingUser) {
-      res.status(400).json({ error: "User doesnot exist" });
-      return;
+      throw new UnauthorizedError("User not found");
     }
 
     const data = await client.uploadData.findFirst({
@@ -133,30 +100,15 @@ const viewSingleData = async (req: IRequest, res: Response): Promise<void> => {
     });
 
     if (data?.id !== Number(id)) {
-      res.status(400).json({
-        error: "Not found any data",
-      });
+      throw new NotFoundError("Not found any data");
     }
 
-    console.log("The uploaded data is:", data);
-
-    res.status(201).json({
-      data,
-    });
-    return;
-  } catch (e: unknown) {
-    console.error("View Uploaded Data Error:", e);
-
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-    } else {
-      res.status(500).json({ message: "An unknown erro occured" });
-    }
+    sendSuccess(res, data, "Data fetched successfully");
   }
-};
+);
 
-const editData = async (req: IRequest, res: Response): Promise<void> => {
-  try {
+const editData = asyncHandler(
+  async (req: IRequest, res: Response): Promise<void> => {
     const userId = req.userId; //logged in user
     const { uploadedId, description } = req.body;
 
@@ -167,8 +119,7 @@ const editData = async (req: IRequest, res: Response): Promise<void> => {
     });
     //CHECK USER EXISTS OR NOT
     if (!existingUser) {
-      res.status(400).json({ error: "User doesnot exist" });
-      return;
+      throw new UnauthorizedError("User not found");
     }
 
     //CHECK WHETHERE THE UPLOADED USER IS SAME OR NOT
@@ -180,10 +131,7 @@ const editData = async (req: IRequest, res: Response): Promise<void> => {
     });
 
     if (!verifyUser) {
-      res
-        .status(404)
-        .json({ error: "not found any data with this document id" });
-      return;
+      throw new NotFoundError("No data found with this document ID");
     }
 
     //update data
@@ -196,30 +144,16 @@ const editData = async (req: IRequest, res: Response): Promise<void> => {
       },
     });
 
-    console.log("The updated data is", updatedData);
-
-    res.status(200).json({
-      message: "Updated Successfully",
-      data: updatedData,
-    });
-
-    return;
-  } catch (e: unknown) {
-    console.error("View Uploaded Data Error:", e);
-
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-    } else {
-      res.status(500).json({ message: "An unknown erro occured" });
-    }
+    sendSuccess(res, updatedData, "Updated Successfully");
   }
-};
+);
 
 //DELETE DATA
-const deleteData = async (req: IRequest, res: Response): Promise<void> => {
-  const userId = req.userId;
-  const { uploadedId } = req.body;
-  try {
+const deleteData = asyncHandler(
+  async (req: IRequest, res: Response): Promise<void> => {
+    const userId = req.userId;
+    const { uploadedId } = req.body;
+
     console.log("Received uploadedId:", uploadedId);
 
     // Verify that the photo belongs to the logged-in user
@@ -231,8 +165,7 @@ const deleteData = async (req: IRequest, res: Response): Promise<void> => {
     });
 
     if (!verifyUser) {
-      res.status(404).json({ error: "No data found with this document ID" });
-      return;
+      throw new NotFoundError("No data found with this document ID");
     }
 
     //  Extract public_id from the photo URL
@@ -255,26 +188,19 @@ const deleteData = async (req: IRequest, res: Response): Promise<void> => {
       });
     });
 
-    res.status(200).json({
-      message: "Deleted Successfully from Cloudinary and database",
-      documentId: uploadedId,
-    });
-  } catch (e: unknown) {
-    console.error("Delete Data Error:", e);
-    res.status(500).json({
-      message: e instanceof Error ? e.message : "An unknown error occurred",
-    });
+    sendSuccess(
+      res,
+      { documentId: uploadedId },
+      "Deleted Successfully from Cloudinary and database"
+    );
   }
-};
+);
 
-const getImagesUsingPagination = async (
-  req: IRequest,
-  res: Response
-): Promise<void> => {
-  const page = parseInt(req.query.page as string);
-  const limit = parseInt(req.query.limit as string);
+const getImagesUsingPagination = asyncHandler(
+  async (req: IRequest, res: Response): Promise<void> => {
+    const page = parseInt(req.query.page as string);
+    const limit = parseInt(req.query.limit as string);
 
-  try {
     const userId = req.userId;
 
     const existingUser = await client.user.findUnique({
@@ -284,8 +210,7 @@ const getImagesUsingPagination = async (
     });
 
     if (!existingUser) {
-      res.status(400).json({ error: "User doesnot exist" });
-      return;
+      throw new UnauthorizedError("User does not exist");
     }
 
     const [images, total] = await Promise.all([
@@ -304,22 +229,17 @@ const getImagesUsingPagination = async (
       }),
     ]);
 
-    res.status(201).json({
-      data: images,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-    });
-    return;
-  } catch (e: unknown) {
-    console.error("View Uploaded Data using Pagination Error:", e);
-
-    if (e instanceof Error) {
-      res.status(500).json({ message: e.message });
-    } else {
-      res.status(500).json({ message: "An unknown erro occured" });
-    }
+    sendSuccess(
+      res,
+      {
+        images,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+      },
+      "Images fetched successfully"
+    );
   }
-};
+);
 
 const uploadController = {
   uploadData,

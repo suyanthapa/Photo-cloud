@@ -10,151 +10,136 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
+const asyncHandler_1 = require("../utils/asyncHandler");
+const errors_1 = require("../utils/errors");
+const response_1 = require("../utils/response");
 const client = new client_1.PrismaClient();
-const sharePhoto = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const userId = req.userId;
-        const { receiverEmail, photoId } = req.body;
-        const receiverUser = yield client.user.findUnique({
-            where: { email: receiverEmail },
-        });
-        if (!receiverUser) {
-            res.status(400).json({ error: "User does not exist" });
-            return;
-        }
-        if (receiverUser.id === Number(userId)) {
-            res.status(400).json({ error: "Cannot share photo with yourself" });
-            return;
-        }
-        const photo = yield client.uploadData.findUnique({
-            where: { id: photoId },
-            select: {
-                id: true,
-                userId: true,
-                sharedWith: true,
-            },
-        });
-        if (!photo || photo.userId !== Number(userId)) {
-            res.status(403).json({ error: "You do not own this photo or it doesn't exist" });
-            return;
-        }
-        if (photo.sharedWith.includes(receiverUser.id)) {
-            res.status(400).json({ error: "Photo already shared with this user" });
-            return;
-        }
-        yield client.uploadData.update({
-            where: { id: photoId },
-            data: {
-                sharedWith: {
-                    push: receiverUser.id,
-                },
-            },
-        });
-        res.status(200).json({ message: "Photo shared successfully" });
+const sharePhoto = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.userId;
+    const { receiverEmail, photoId } = req.body;
+    const receiverUser = yield client.user.findUnique({
+        where: { email: receiverEmail },
+    });
+    if (!receiverUser) {
+        throw new errors_1.NotFoundError("User does not exist");
     }
-    catch (e) {
-        console.error("Share error:", e);
-        res.status(500).json({
-            message: e instanceof Error ? e.message : "An unknown error occurred",
-        });
+    if (receiverUser.id === Number(userId)) {
+        throw new errors_1.ValidationError("Cannot share photo with yourself");
     }
-});
-const viewSharedPhotos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const loggedInUserId = Number(req.userId);
-        const myPhotos = yield client.uploadData.findMany({
-            where: {
-                userId: loggedInUserId,
-                sharedWith: {
-                    isEmpty: false, // Only show photos that are shared
-                },
-            },
-            select: {
-                id: true,
-                photo: true,
-                description: true,
-                sharedWith: true,
-            },
-        });
-        // Get all user IDs from sharedWith arrays
-        const allUserIds = [...new Set(myPhotos.flatMap(photo => photo.sharedWith))];
-        const users = yield client.user.findMany({
-            where: {
-                id: { in: allUserIds },
-            },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-            },
-        });
-        // Create a map with full user info
-        const userMap = Object.fromEntries(users.map(user => [user.id, { username: user.username, email: user.email }]));
-        const formatted = myPhotos.flatMap(photo => photo.sharedWith.map(userId => {
-            var _a, _b;
-            return ({
-                uploadData: {
-                    id: photo.id,
-                    photo: photo.photo,
-                    description: photo.description,
-                },
-                user: {
-                    id: userId,
-                    username: ((_a = userMap[userId]) === null || _a === void 0 ? void 0 : _a.username) || "Unknown",
-                    email: ((_b = userMap[userId]) === null || _b === void 0 ? void 0 : _b.email) || "N/A",
-                },
-            });
-        }));
-        res.status(200).json({
-            message: "Your shared photos",
-            data: formatted,
-        });
+    const photo = yield client.uploadData.findUnique({
+        where: { id: photoId },
+        select: {
+            id: true,
+            userId: true,
+        },
+    });
+    if (!photo || photo.userId !== Number(userId)) {
+        throw new errors_1.UnauthorizedError("You do not own this photo or it doesn't exist");
     }
-    catch (e) {
-        console.error("ViewSharedPhotos error:", e);
-        res.status(500).json({
-            message: e instanceof Error ? e.message : "An unknown error occurred",
-        });
+    const alreadyShared = yield client.photoShare.findFirst({
+        where: {
+            photoId,
+            sharedWith: receiverEmail,
+        },
+    });
+    if (alreadyShared) {
+        throw new errors_1.ConflictError("Photo already shared with this email");
     }
-});
-const sharedToMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const loggedInUserId = Number(req.userId);
-        const sharedPhotos = yield client.uploadData.findMany({
-            where: {
-                sharedWith: {
-                    has: loggedInUserId,
+    // Save share record
+    yield client.photoShare.create({
+        data: {
+            photoId,
+            sharedById: Number(userId),
+            sharedWith: receiverEmail,
+        },
+    });
+    (0, response_1.sendSuccess)(res, null, "Photo shared successfully");
+}));
+const viewSharedPhotos = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const loggedInUserId = Number(req.userId);
+    //Find all PhotoShare records where the current user shared the photo
+    const shares = yield client.photoShare.findMany({
+        where: {
+            sharedById: loggedInUserId,
+        },
+        include: {
+            //Include related photo data for each shared entry
+            photo: {
+                select: {
+                    id: true,
+                    photo: true,
+                    description: true,
                 },
             },
-            select: {
-                id: true,
-                photo: true,
-                description: true,
-                createdAt: true,
-                user: {
-                    select: {
-                        id: true,
-                        username: true,
-                        email: true
+        },
+    });
+    //format the result for frontend display
+    const formatted = shares.map((share) => ({
+        sharedAt: share.sharedAt,
+        sharedWith: share.sharedWith,
+        photo: {
+            id: share.photo.id,
+            photo: share.photo.photo,
+            discription: share.photo.description,
+        },
+    }));
+    (0, response_1.sendSuccess)(res, formatted, "Your shared photos");
+}));
+const sharedToMe = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const loggedInUserId = Number(req.userId);
+    // First get current user's email in a single optimized query
+    const currentUser = yield client.user.findUnique({
+        where: { id: loggedInUserId },
+        select: { email: true },
+    });
+    if (!currentUser) {
+        throw new errors_1.NotFoundError("User not found");
+    }
+    // Optimized: Single query with all required includes to avoid N+1
+    const sharedPhotos = yield client.photoShare.findMany({
+        where: {
+            sharedWith: currentUser.email,
+        },
+        include: {
+            photo: {
+                select: {
+                    id: true,
+                    description: true,
+                    photo: true,
+                    createdAt: true,
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                            email: true,
+                        },
                     },
                 },
             },
-        });
-        res.status(200).json({
-            message: "Photos shared with you",
-            data: sharedPhotos,
-        });
-    }
-    catch (e) {
-        console.error("SharedToMe error:", e);
-        res.status(500).json({
-            message: e instanceof Error ? e.message : "An unknown error occurred",
-        });
-    }
-});
+            sharedBy: {
+                select: {
+                    id: true,
+                    username: true,
+                    email: true,
+                },
+            },
+        },
+    });
+    const formatted = sharedPhotos.map((entry) => ({
+        sharedAt: entry.sharedAt,
+        sharedBy: entry.photo.user,
+        photo: {
+            id: entry.photo.id,
+            photo: entry.photo.photo,
+            description: entry.photo.description,
+            createdAt: entry.photo.createdAt,
+        },
+    }));
+    (0, response_1.sendSuccess)(res, formatted, "Photos shared with you");
+}));
 const shareController = {
     sharePhoto,
     viewSharedPhotos,
-    sharedToMe
+    sharedToMe,
 };
 exports.default = shareController;
