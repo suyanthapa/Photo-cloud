@@ -1,26 +1,23 @@
-import nodemailer from "nodemailer";
+import Mailgun from "mailgun.js";
+import formData from "form-data";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// Validate required Gmail SMTP environment variables
-if (!process.env.SMTP_USERNAME) {
-  throw new Error('SMTP_USERNAME is required in environment variables');
+// Validate required Mailgun environment variables
+if (!process.env.MAILGUN_API_KEY) {
+  throw new Error("MAILGUN_API_KEY is required in environment variables");
 }
 
-if (!process.env.SMTP_PASSWORD) {
-  throw new Error('SMTP_PASSWORD is required in environment variables');
+if (!process.env.MAILGUN_DOMAIN) {
+  throw new Error("MAILGUN_DOMAIN is required in environment variables");
 }
 
-// Create nodemailer transport for Gmail SMTP
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: parseInt(process.env.SMTP_PORT || "587"),
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USERNAME,
-    pass: process.env.SMTP_PASSWORD,
-  },
+// Initialize Mailgun client
+const mailgun = new Mailgun(formData);
+const mg = mailgun.client({
+  username: "api",
+  key: process.env.MAILGUN_API_KEY as string,
 });
 
 export async function sendEmail(
@@ -29,20 +26,32 @@ export async function sendEmail(
   html: string,
   text: string
 ): Promise<any> {
+  console.log("🔍 Attempting to send email with Mailgun SDK...");
+  console.log("📧 To:", to);
+  console.log("🌐 Domain:", process.env.MAILGUN_DOMAIN);
+
   try {
-    const mailOptions = {
-      from: `"PhotoCloud" <${process.env.SMTP_USERNAME}>`,
-      to,
+    const messageData = {
+      from: `PhotoCloud <noreply@${process.env.MAILGUN_DOMAIN}>`,
+      to: [to],
       subject,
       text,
       html,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully:", info.messageId);
-    return info;
+    const response = await mg.messages.create(
+      process.env.MAILGUN_DOMAIN as string,
+      messageData
+    );
+
+    console.log("✅ Email sent successfully via Mailgun SDK");
+    console.log("📤 Message ID:", response.id);
+    return response;
   } catch (error: any) {
-    console.error("Gmail SMTP error:", error);
+    console.error("❌ Mailgun API error:", error);
+    if (error.details) {
+      console.error("📋 Error details:", error.details);
+    }
     throw new Error(`Failed to send email: ${error.message}`);
   }
 }
