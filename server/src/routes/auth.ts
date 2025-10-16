@@ -44,6 +44,14 @@ authRouter.post(
   authController.verifyInputOTP
 );
 
+//resend OTP for email verification
+authRouter.post(
+  "/resend-otp",
+  otpLimiter,
+  validate(userValidation.resendOtp),
+  authController.resendOtp
+);
+
 //forgot password --sends otp
 authRouter.post("/forgot-password", otpLimiter, authController.forgotPassword);
 

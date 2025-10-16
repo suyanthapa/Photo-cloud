@@ -2,10 +2,10 @@ import { PrismaClient } from "@prisma/client";
 
 import bcrypt from "bcrypt";
 import {
-  emailTemplateForgotPassword,
+  emailTemplateForgot as emailTemplateForgotPassword,
   emailTemplateVerify,
   sendEmail,
-} from "./mailer";
+} from "./mailer_gmail";
 import { EmailServiceError, OTPServiceError } from "../utils/errors";
 
 interface VerifyOTPResult {

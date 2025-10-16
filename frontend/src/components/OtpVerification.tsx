@@ -28,9 +28,13 @@ const OtpVerification: React.FC = () => {
   const params = useParams();
 
   // 1️⃣ Determine flow from URL param
-  const flowParam = params.flow; // 'register' or 'forgot-password'
-  const flow: "register" | "forgot" =
-    flowParam === "register" ? "register" : "forgot";
+  const flowParam = params.flow; // 'register', 'forgot-password', or 'login'
+  const flow: "register" | "forgot" | "login" =
+    flowParam === "register"
+      ? "register"
+      : flowParam === "login"
+      ? "login"
+      : "forgot";
 
   // 2️⃣ Pull email from location.state
   const email = location.state?.email;
@@ -86,7 +90,7 @@ const OtpVerification: React.FC = () => {
       console.log("OTP verification response:", res.data);
 
       // Navigate based on flow
-      if (flow === "register") {
+      if (flow === "register" || flow === "login") {
         navigate("/login");
       } else {
         navigate("/forgot-password/reset-password", { state: { email } });
@@ -109,10 +113,14 @@ const OtpVerification: React.FC = () => {
 
     try {
       // Determine which endpoint to call based on flow
-      const endpoint =
-        flow === "register"
-          ? `${apiBaseUrl}/api/auth/register`
-          : `${apiBaseUrl}/api/auth/forgot-password`;
+      let endpoint;
+      if (flow === "register") {
+        endpoint = `${apiBaseUrl}/api/auth/register`;
+      } else if (flow === "login") {
+        endpoint = `${apiBaseUrl}/api/auth/resend-otp`;
+      } else {
+        endpoint = `${apiBaseUrl}/api/auth/forgot-password`;
+      }
 
       await axios.post(endpoint, { email });
 
@@ -136,6 +144,12 @@ const OtpVerification: React.FC = () => {
       description:
         "Enter the 6-digit OTP sent to your email to activate your account.",
       backRoute: "/register",
+    },
+    login: {
+      title: "Verify your email",
+      description:
+        "Enter the 6-digit OTP sent to your email to complete login.",
+      backRoute: "/login",
     },
     forgot: {
       title: "Reset Password",

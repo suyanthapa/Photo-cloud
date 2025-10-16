@@ -48,6 +48,15 @@ const userValidation = {
     }),
   },
 
+  resendOtp: {
+    body: Joi.object({
+      email: Joi.string().email().required().messages({
+        "any.required": "Email is required",
+        "string.email": "Invalid email format",
+      }),
+    }),
+  },
+
   resetPassword: {
     body: Joi.object({
       email: Joi.string().email().required().messages({

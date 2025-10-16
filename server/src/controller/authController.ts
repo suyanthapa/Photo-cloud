@@ -283,6 +283,26 @@ const me = asyncHandler(async (req: IRequest, res: Response): Promise<void> => {
   );
 });
 
+//resend OTP for email verification
+const resendOtp = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { email } = req.body;
+
+    const user = await findUserByEmail(email);
+    if (!user) {
+      throw new NotFoundError("User");
+    }
+
+    if (user.isEmailVerified) {
+      throw new AppError("Email is already verified", 400);
+    }
+
+    await createAndSendOTP(email, "verify", user.id);
+
+    sendSuccess(res, {}, "OTP sent successfully to your email", 200);
+  }
+);
+
 const authController = {
   register,
   login,
@@ -291,6 +311,7 @@ const authController = {
   forgotPassword,
   verifyForgotPasswordOtp,
   resetPassword,
+  resendOtp,
 
   logout,
   updatePassword,

@@ -38,12 +38,19 @@ const Login: React.FC = () => {
       }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || "❌ Login Failed";
-      setMessage(errorMessage);
-
       const status = err.response?.status;
-      if (status === 403) {
-        // Email not verified
+
+      // Check if email verification is required (status 400)
+      if (status === 400 && errorMessage.includes("verify your email")) {
+        setMessage("📧 OTP sent to your email. Redirecting to verification...");
+        setTimeout(() => {
+          navigate("/login/verify-otp", { state: { email: formData.email } });
+        }, 1500);
+      } else if (status === 403) {
+        // Email not verified (alternative case)
         navigate("/sent-email", { state: { email: formData.email } });
+      } else {
+        setMessage(errorMessage);
       }
     } finally {
       setIsLoading(false);
