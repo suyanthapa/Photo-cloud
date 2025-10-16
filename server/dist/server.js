@@ -14,6 +14,7 @@ const security_1 = require("./config/security");
 const errorHandler_1 = require("./Middleware/errorHandler");
 dotenv_1.default.config();
 const server = (0, express_1.default)();
+server.set("trust proxy", 1);
 (0, security_1.setupSecurity)(server);
 server.use(express_1.default.json());
 server.use(express_1.default.urlencoded({ extended: true }));

@@ -16,20 +16,21 @@ exports.sendEmail = sendEmail;
 exports.emailTemplateVerify = emailTemplateVerify;
 exports.emailTemplateForgotPassword = emailTemplateForgotPassword;
 const nodemailer_1 = __importDefault(require("nodemailer"));
-// Create nodemailer transport
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const transporter = nodemailer_1.default.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
+    host: process.env.MAILGUN_HOST,
+    port: parseInt(process.env.MAILGUN_PORT || "587"),
     auth: {
-        user: process.env.SMTP_USERNAME,
-        pass: process.env.SMTP_PASSWORD,
+        user: process.env.MAILGUN_USERNAME,
+        pass: process.env.MAILGUN_PASSWORD,
     },
+    secure: false, // Mailgun uses STARTTLS on port 587
 });
-// Generic function to send emails — no token generation here
 function sendEmail(to, subject, html, text) {
     return __awaiter(this, void 0, void 0, function* () {
         const info = yield transporter.sendMail({
-            from: `"photoCloud" `,
+            from: `"photoCloud" <${process.env.MAILGUN_USERNAME}>`,
             to,
             subject,
             text,
@@ -58,30 +59,3 @@ function emailTemplateForgotPassword(token) {
     <p>Do not share this OTP with anyone.</p>`;
     return { subject, text, html };
 }
-// 📩 Specific email sending function for verify email while registering
-// export const verifyUserEmail = async (userEmail: string) => {
-//   const token = generateToken(); // generate here only once
-//   const subject = "Password Recovery - Verify Your Email";
-//   const text = `Hello, use the token to verify your email: ${token}`;
-//   const html = `<p>Dear User,</p>
-//     <p>Please use the following token to verify your email address:</p>
-//     <p><b style="font-size: 20px;">${token}</b></p>
-//     <p>Do not share this token with anyone.</p>
-//     <p>Thank you,<br />The photoCloud Team</p>`;
-//   const info = await sendEmail(userEmail, subject, html, text);
-//   console.log("token by function", token);
-//   return { token, info }; // return the SAME token
-// };
-// export const forgotPasswordEmail = async (userEmail: string) => {
-//   const token = generateToken(); // generate here only once
-//   const subject = "Password Recovery - Verify Your Email";
-//   const text = `Hello, use the token to verify your email: ${token}`;
-//   const html = `<p>Dear User,</p>
-//     <p>Please use the following token to verify your email address:</p>
-//     <p><b style="font-size: 20px;">${token}</b></p>
-//     <p>Do not share this token with anyone.</p>
-//     <p>Thank you,<br />The photoCloud Team</p>`;
-//   const info = await sendEmail(userEmail, subject, html, text);
-//   console.log("token by function", token);
-//   return { token, info }; // return the SAME token
-// };

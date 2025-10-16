@@ -26,7 +26,7 @@ const errorHandler = (error, req, res, next) => {
     //  API response
     const response = process.env.NODE_ENV === "development"
         ? { success: false, message, stack: (0, stackParser_1.parseStack)(error.stack) } // dev sees details
-        : { success: false, message: "Internal Server Error" }; // prod safe
+        : { success: false, message }; // prod safe
     res.status(statusCode).json(response);
 };
 exports.errorHandler = errorHandler;

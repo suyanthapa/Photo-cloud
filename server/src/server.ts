@@ -8,12 +8,10 @@ import path from "path";
 import sharedRouter from "./routes/share";
 import { setupSecurity } from "./config/security";
 import { errorHandler, notFoundHandler } from "./Middleware/errorHandler";
-import { error } from "console";
 
 dotenv.config();
 const server = express();
 
-server.set("trust proxy", 1);
 setupSecurity(server);
 
 server.use(express.json());

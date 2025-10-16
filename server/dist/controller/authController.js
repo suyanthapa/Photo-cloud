@@ -31,6 +31,12 @@ const register = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0
     if (existingUser) {
         throw new errors_1.ConflictError("User already exists");
     }
+    const uniqueUsername = yield client.user.findUnique({
+        where: { username },
+    });
+    if (uniqueUsername) {
+        throw new errors_1.ConflictError("Username already taken");
+    }
     // Hash password
     const hashedPassword = yield bcrypt_1.default.hash(password, 10); // 10 = salt rounds
     console.log("Hashed pw is", hashedPassword);
@@ -38,6 +44,8 @@ const register = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0
     const user = yield client.user.create({
         data: { email, username, password: hashedPassword },
     });
+    console.log("Email is", email);
+    console.log("ID:", user.id);
     //send  verify otp
     yield (0, otpService_1.createAndSendOTP)(email, "verify", user.id);
     (0, response_1.sendSuccess)(res, {
