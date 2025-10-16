@@ -12,6 +12,7 @@ import { errorHandler, notFoundHandler } from "./Middleware/errorHandler";
 dotenv.config();
 const server = express();
 
+server.set("trust proxy", 1);
 setupSecurity(server);
 
 server.use(express.json());
