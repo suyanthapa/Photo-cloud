@@ -72,7 +72,7 @@ const login = asyncHandler(
     const existingUser = await findUserByEmail(email);
     if (!existingUser) {
       throw new NotFoundError("User");
-    }
+    } 
 
     // Compare password with hashed password
     const isPasswordValid = await bcrypt.compare(
@@ -93,6 +93,7 @@ const login = asyncHandler(
     const token = jwt.sign(
       {
         userId: existingUser.id,
+        username: existingUser.username,
       },
       process.env.JWT_SECRET as string,
       { expiresIn: "7d" }

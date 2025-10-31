@@ -18,8 +18,8 @@ export async function sendEmail(
   html: string,
   text: string
 ): Promise<any> {
-  console.log("🔍 Attempting to send email with Gmail SMTP...");
-  console.log("📧 To:", to);
+  console.log(" Attempting to send email with Gmail SMTP...");
+  console.log(" To:", to);
 
   try {
     const mailOptions = {
@@ -31,11 +31,11 @@ export async function sendEmail(
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Email sent successfully via Gmail");
-    console.log("📤 Message ID:", info.messageId);
+    console.log(" Email sent successfully via Gmail");
+    console.log(" Message ID:", info.messageId);
     return info;
   } catch (error: any) {
-    console.error("❌ Gmail SMTP error:", error);
+    console.error(" Gmail SMTP error:", error);
     throw new Error(`Failed to send email: ${error.message}`);
   }
 }

@@ -61,7 +61,7 @@ export const createAndSendOTP = async function (
     try {
       await sendEmail(email, template.subject, template.html, template.text);
     } catch (emailError) {
-      // If email fails, we should still clean up the OTP
+      // If email fails,  still clean up the OTP
       await prisma.emailVerification
         .delete({
           where: { email },

@@ -9,6 +9,7 @@ import {
   ConflictError,
 } from "../utils/errors";
 import { sendSuccess } from "../utils/response";
+import { notificationGateway } from "../server";
 const client = new PrismaClient();
 
 const sharePhoto = asyncHandler(

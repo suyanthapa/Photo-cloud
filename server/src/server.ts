@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import uploadRouter from "./routes/upload";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import http from "http";
 import path from "path";
 import sharedRouter from "./routes/share";
 import { setupSecurity } from "./config/security";
@@ -13,6 +14,8 @@ dotenv.config();
 const server = express();
 
 server.set("trust proxy", 1);
+const hServer = http.createServer(server);
+
 setupSecurity(server);
 
 server.use(express.json());

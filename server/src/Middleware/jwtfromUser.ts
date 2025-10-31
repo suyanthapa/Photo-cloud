@@ -2,7 +2,8 @@ import { NextFunction, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import dotenv from "dotenv";
 import IRequest from "./IRequest";
-
+import { PrismaClient } from "@prisma/client";
+const client = new PrismaClient();
 dotenv.config();
 
 const getUserfromAuthToken = async (
@@ -20,14 +21,18 @@ const getUserfromAuthToken = async (
       return;
     }
 
-    const decode = jwt.verify(token, process.env.JWT_SECRET as string);
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as JwtPayload;
 
-    if (typeof decode === "string") {
+    if (!decoded || typeof decoded === "string") {
       res.status(403).json({ message: "You are not authorized" });
       return;
     }
-    
-    req.userId = (decode as JwtPayload).userId;
+
+    req.userId = decoded.userId;
+    req.username = decoded.username;
     next();
   } catch (e) {
     console.error("Auth error:", e);
@@ -36,3 +41,19 @@ const getUserfromAuthToken = async (
 };
 
 export default getUserfromAuthToken;
+
+// Shared function that both HTTP and Socket.IO can use
+export const verifyAndGetUser = async (token: string) => {
+  const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+
+  const user = await client.user.findUnique({
+    where: { id: decoded.userId },
+    select: { id: true, username: true, email: true },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+};
