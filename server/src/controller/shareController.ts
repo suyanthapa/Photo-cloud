@@ -9,7 +9,8 @@ import {
   ConflictError,
 } from "../utils/errors";
 import { sendSuccess } from "../utils/response";
-import { notificationGateway } from "../server";
+import { io } from "../server";
+
 const client = new PrismaClient();
 
 const sharePhoto = asyncHandler(
@@ -61,6 +62,40 @@ const sharePhoto = asyncHandler(
         sharedById: Number(userId),
         sharedWith: receiverEmail,
       },
+    });
+
+    // Get sharer's info for notification
+    const sharer = await client.user.findUnique({
+      where: { id: Number(userId) },
+      select: { username: true },
+    });
+
+    // Create notification for receiver
+    const notification = await client.notification.create({
+      data: {
+        userId: receiverUser.id,
+        actorId: Number(userId),
+        type: "photo_shared",
+        title: "Photo Shared",
+        body: `${sharer?.username || "Someone"} shared a photo with you`,
+        data: JSON.stringify({
+          photoId: photoId,
+          sharedBy: sharer?.username || "Unknown",
+          sharedAt: new Date().toISOString(),
+        }),
+        isRead: false,
+      },
+      include: {
+        actor: {
+          select: { id: true, username: true, email: true },
+        },
+      },
+    });
+
+    // Send real-time notification via Socket.IO
+    io.to(receiverUser.id.toString()).emit("notification", {
+      type: "new_notification",
+      notification: notification,
     });
 
     sendSuccess(res, null, "Photo shared successfully");

@@ -17,10 +17,11 @@ model User {
   isOnline        Boolean   @default(false)
   lastSeen        DateTime?
 
-  uploads           uploadData[]        @relation("OwnerUploads")
-  sharedPhotos      PhotoShare[]        @relation("SharedBy") // ✅ Added
-  EmailVerification EmailVerification[]
-  Notification      Notification[]
+  uploads            uploadData[]        @relation("OwnerUploads")
+  sharedPhotos       PhotoShare[]        @relation("SharedBy") // ✅ Added
+  EmailVerification  EmailVerification[]
+  Notification       Notification[]
+  actorNotifications Notification[]      @relation("NotificationActor")
 }
 
 model uploadData {
@@ -72,7 +73,8 @@ model Notification {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actor User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead])
 }
