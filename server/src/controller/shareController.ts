@@ -10,6 +10,7 @@ import {
 } from "../utils/errors";
 import { sendSuccess } from "../utils/response";
 import { io } from "../server";
+import { pushNotificationToStream } from "../lib/redis";
 
 const client = new PrismaClient();
 
@@ -35,6 +36,7 @@ const sharePhoto = asyncHandler(
       select: {
         id: true,
         userId: true,
+        description: true,
       },
     });
 
@@ -70,9 +72,9 @@ const sharePhoto = asyncHandler(
       select: { username: true },
     });
 
-    // Create notification for receiver
-    const notification = await client.notification.create({
-      data: {
+    // 🚀 Step 6: REDIS STREAMS FLOW - Push to stream instead of direct DB
+    try {
+      await pushNotificationToStream({
         userId: receiverUser.id,
         actorId: Number(userId),
         type: "photo_shared",
@@ -80,24 +82,22 @@ const sharePhoto = asyncHandler(
         body: `${sharer?.username || "Someone"} shared a photo with you`,
         data: JSON.stringify({
           photoId: photoId,
+          photoDescription: photo.description,
           sharedBy: sharer?.username || "Unknown",
           sharedAt: new Date().toISOString(),
+          actionUrl: `/photos/${photoId}`,
         }),
-        isRead: false,
-      },
-      include: {
-        actor: {
-          select: { id: true, username: true, email: true },
-        },
-      },
-    });
+      });
 
-    // Send real-time notification via Socket.IO
-    io.to(receiverUser.id.toString()).emit("notification", {
-      type: "new_notification",
-      notification: notification,
-    });
+      console.log(
+        `📨 Notification queued for user ${receiverUser.id} via Redis Streams`
+      );
+    } catch (streamError) {
+      console.error("❌ Failed to queue notification:", streamError);
+      // Don't fail the share operation if notification fails
+    }
 
+    // ✅ Step 7: Return success immediately (async notification processing)
     sendSuccess(res, null, "Photo shared successfully");
   }
 );

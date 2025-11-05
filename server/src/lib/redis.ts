@@ -9,7 +9,17 @@ export async function pushNotificationToStream(payload: Record<string, any>) {
   for (const [k, v] of Object.entries(payload)) {
     flat.push(k, typeof v === "string" ? v : JSON.stringify(v));
   }
-  return redis.xadd("notification:stream", "*", ...flat);
+  return redis.xadd("notifications:stream", "*", ...flat);
+}
+
+// ✅ Add a simple notification cache helper
+export async function cacheNotificationCount(userId: number) {
+  const count = (await redis.get(`user:${userId}:unread_count`)) || 0;
+  return parseInt(count.toString());
+}
+
+export async function incrementNotificationCount(userId: number) {
+  return redis.incr(`user:${userId}:unread_count`);
 }
 
 //Line : 7 -- payload is an object like { userId: 42, message: "Hi!", data: { foo: "bar" } }.
