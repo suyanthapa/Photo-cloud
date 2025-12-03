@@ -76,8 +76,9 @@ server.use(
 
 // ===== Routes =====
 server.use("/api/auth", authRouter);
-server.use("/api/data", uploadRouter);
-server.use("/api/data/share", sharedRouter);
+server.use("/api/data/share", sharedRouter); // more specific first
+server.use("/api/data", uploadRouter); // general last
+
 server.use("/api/notifications", notificationRouter);
 
 // ===== Error Handling =====
