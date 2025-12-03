@@ -1,15 +1,17 @@
 meta {
-  name: get 
+  name: get
   type: http
   seq: 1
 }
 
 get {
-  url: 
+  url: GET http://localhost:8000/api/notifications
+http://localhost:8000/api/notifications/unread-count
   body: none
   auth: inherit
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

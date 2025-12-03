@@ -37,6 +37,7 @@ const corsOptions = {
 
 // Apply CORS to Express
 server.use(cors(corsOptions));
+server.options("*", cors(corsOptions));
 
 // ===== HTTP + Socket.IO =====
 const httpServer = http.createServer(server);
